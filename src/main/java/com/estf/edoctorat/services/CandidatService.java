@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CandidatService {
@@ -15,5 +16,11 @@ public class CandidatService {
 //    public List<CandidatModel> candidats;
     public List<CandidatModel> getCandidats() {
         return candidatRepository.findAll();
+    }
+    public Optional<CandidatModel> getCandidatById(Long id) {
+        return candidatRepository.findById(id);
+    }
+    public List<CandidatModel> getCandidatByName(String name) {
+        return candidatRepository.findByNomCandidatAr(name);
     }
 }

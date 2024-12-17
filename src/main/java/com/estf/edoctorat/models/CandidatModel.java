@@ -15,7 +15,7 @@ public class CandidatModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String cne;
     private String cni;
     private String nomCandidatAr;
