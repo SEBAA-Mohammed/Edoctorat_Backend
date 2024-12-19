@@ -27,6 +27,15 @@ public class CandidatService {
         return candidatRepository.save(candidat);
     }
 
+    public void deleteCandidat(Long id) {
+        if (candidatRepository.existsById(id)) {
+            candidatRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Candidat not found with ID " + id);
+        }
+    }
+
+
     public CandidatModel updateCandidat(Long id, CandidatModel updatedCandidat) {
         return candidatRepository.findById(id).map(candidat -> {
             candidat.setCne(updatedCandidat.getCne());

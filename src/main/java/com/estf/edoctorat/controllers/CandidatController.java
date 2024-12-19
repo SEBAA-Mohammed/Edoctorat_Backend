@@ -40,5 +40,11 @@ public class CandidatController {
         return candidatService.updateCandidat(id, candidat);
     }
 
+    @DeleteMapping("/{id}")
+    public String deleteCandidat(@PathVariable Long id) {
+        candidatService.deleteCandidat(id);
+        return "Candidat with ID " + id + " has been deleted!";
+    }
+
 
 }
