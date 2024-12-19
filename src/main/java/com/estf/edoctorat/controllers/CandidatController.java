@@ -3,10 +3,7 @@ package com.estf.edoctorat.controllers;
 import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.services.CandidatService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,4 +29,10 @@ public class CandidatController {
     public List<CandidatModel> getByName(@PathVariable String name) {
         return candidatService.getCandidatByName(name);
     }
+
+    @PostMapping
+    public CandidatModel create(@RequestBody CandidatModel candidat) {
+        return candidatService.createCandidat(candidat);
+    }
+
 }

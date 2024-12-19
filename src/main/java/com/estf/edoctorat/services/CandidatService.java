@@ -23,4 +23,8 @@ public class CandidatService {
     public List<CandidatModel> getCandidatByName(String name) {
         return candidatRepository.findByNomCandidatAr(name);
     }
+    public CandidatModel createCandidat(CandidatModel candidat) {
+        return candidatRepository.save(candidat);
+    }
+
 }
