@@ -35,4 +35,10 @@ public class CandidatController {
         return candidatService.createCandidat(candidat);
     }
 
+    @PutMapping("/{id}")
+    public CandidatModel update(@PathVariable Long id, @RequestBody CandidatModel candidat) {
+        return candidatService.updateCandidat(id, candidat);
+    }
+
+
 }

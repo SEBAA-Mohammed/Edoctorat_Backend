@@ -27,4 +27,31 @@ public class CandidatService {
         return candidatRepository.save(candidat);
     }
 
+    public CandidatModel updateCandidat(Long id, CandidatModel updatedCandidat) {
+        return candidatRepository.findById(id).map(candidat -> {
+            candidat.setCne(updatedCandidat.getCne());
+            candidat.setCni(updatedCandidat.getCni());
+            candidat.setNomCandidatAr(updatedCandidat.getNomCandidatAr());
+            candidat.setPrenomCandidatAr(updatedCandidat.getPrenomCandidatAr());
+            candidat.setAdresseAr(updatedCandidat.getAdresseAr());
+            candidat.setAdresse(updatedCandidat.getAdresse());
+            candidat.setSexe(updatedCandidat.getSexe());
+            candidat.setVilleDeNaissance(updatedCandidat.getVilleDeNaissance());
+            candidat.setVilleDeNaissanceAr(updatedCandidat.getVilleDeNaissanceAr());
+            candidat.setVille(updatedCandidat.getVille());
+            candidat.setDateDeNaissance(updatedCandidat.getDateDeNaissance());
+            candidat.setTypeDeHandicape(updatedCandidat.getTypeDeHandicape());
+            candidat.setAcademie(updatedCandidat.getAcademie());
+            candidat.setTelCandidat(updatedCandidat.getTelCandidat());
+            candidat.setPathCv(updatedCandidat.getPathCv());
+            candidat.setPathPhoto(updatedCandidat.getPathPhoto());
+            candidat.setEtatDossier(updatedCandidat.getEtatDossier());
+            candidat.setSituation_familiale(updatedCandidat.getSituation_familiale());
+            candidat.setPay_id(updatedCandidat.getPay_id());
+            candidat.setUser_id(updatedCandidat.getUser_id());
+            candidat.setFonctionaire(updatedCandidat.getFonctionaire());
+            return candidatRepository.save(candidat);
+        }).orElseThrow(() -> new RuntimeException("Candidat not found with id " + id));
+    }
+
 }
