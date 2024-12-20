@@ -1,10 +1,7 @@
 package com.estf.edoctorat.models;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
@@ -35,6 +32,8 @@ public class CandidatModel {
     private int etatDossier;
     private String situation_familiale;
     private String pay_id;
-    private String user_id;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private UserModel user;
     private int fonctionaire;
 }
