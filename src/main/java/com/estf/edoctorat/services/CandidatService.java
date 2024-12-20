@@ -1,7 +1,9 @@
 package com.estf.edoctorat.services;
 
 import com.estf.edoctorat.models.CandidatModel;
+import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.CandidatRepository;
+import com.estf.edoctorat.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import java.util.Optional;
 public class CandidatService {
     @Autowired
     private CandidatRepository candidatRepository;
+    private UserRepository userRepository;
 
 //    public List<CandidatModel> candidats;
     public List<CandidatModel> getCandidats() {
@@ -57,10 +60,22 @@ public class CandidatService {
             candidat.setEtatDossier(updatedCandidat.getEtatDossier());
             candidat.setSituation_familiale(updatedCandidat.getSituation_familiale());
             candidat.setPay_id(updatedCandidat.getPay_id());
-            candidat.setUser_id(updatedCandidat.getUser_id());
             candidat.setFonctionaire(updatedCandidat.getFonctionaire());
+
+            // Handle the user relationship
+            if (updatedCandidat.getUser() != null && updatedCandidat.getUser().getId() != null) {
+                Long userId = updatedCandidat.getUser().getId();
+                UserModel user = userRepository.findById(userId)
+                        .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
+                candidat.setUser(user);
+            } else {
+                candidat.setUser(null); // Clear the user if not provided
+            }
+
             return candidatRepository.save(candidat);
         }).orElseThrow(() -> new RuntimeException("Candidat not found with id " + id));
     }
 
 }
+
+

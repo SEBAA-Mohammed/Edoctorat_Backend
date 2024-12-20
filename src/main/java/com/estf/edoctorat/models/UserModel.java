@@ -15,7 +15,7 @@ public class UserModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String password;
     private Date last_login;
     private Boolean is_superuser;
