@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/candidats")
+@RequestMapping("/api/candidats")
 public class CandidatController {
 
     @Autowired
@@ -20,12 +20,12 @@ public class CandidatController {
         return candidatService.getCandidats();
     }
 
-    @GetMapping("/candidatById/{id}")
+    @GetMapping("/{id}")
     public Optional<CandidatModel> getById(@PathVariable Long id) {
         return candidatService.getCandidatById(id);
     }
 
-    @GetMapping("/candidatByName/{name}")
+    @GetMapping("/{name}")
     public List<CandidatModel> getByName(@PathVariable String name) {
         return candidatService.getCandidatByName(name);
     }
