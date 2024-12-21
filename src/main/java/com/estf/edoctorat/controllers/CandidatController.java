@@ -18,6 +18,7 @@ public class CandidatController {
 
     @Autowired
     private CandidatService candidatService;
+    @Autowired
     private UserRepository userRepository;
 
     @GetMapping()

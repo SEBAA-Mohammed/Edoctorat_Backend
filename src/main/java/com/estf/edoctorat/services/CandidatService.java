@@ -14,6 +14,7 @@ import java.util.Optional;
 public class CandidatService {
     @Autowired
     private CandidatRepository candidatRepository;
+    @Autowired
     private UserRepository userRepository;
 
 //    public List<CandidatModel> candidats;
