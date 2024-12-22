@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity()
 @Data
@@ -32,8 +33,10 @@ public class CandidatModel {
     private int etatDossier;
     private String situation_familiale;
     private String pay_id;
+    private int fonctionaire;
     @OneToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
-    private int fonctionaire;
+    @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DiplomeModel> diplomes;
 }
