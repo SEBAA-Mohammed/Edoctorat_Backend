@@ -32,7 +32,9 @@ public class CandidatModel {
     private String pathPhoto;
     private int etatDossier;
     private String situation_familiale;
-    private String pay_id;
+    @ManyToOne
+    @JoinColumn(name = "pays_id")
+    private PaysModel pays;
     private int fonctionaire;
     @OneToOne
     @JoinColumn(name = "user_id")
