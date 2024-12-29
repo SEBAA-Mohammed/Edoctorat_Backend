@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.estf.edoctorat.models.ProfesseurModel;
 import com.estf.edoctorat.repositories.ProfesseurRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ProfesseurService {
     @Autowired
     private ProfesseurRepository professeurRepository;
