@@ -5,14 +5,16 @@ import lombok.Data;
 
 @Entity()
 @Data
+@Table(name = "annexe")
+
 public class AnnexeModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String typeAnnexe;
-    private String Titre;
+    private String titre;
     private String pathFile;
     @ManyToOne
-    @JoinColumn(name = "diplome_id", nullable = false)
+    @JoinColumn(name = "diplome", nullable = false)
     private DiplomeModel diplome;
 }

@@ -1,6 +1,5 @@
 package com.estf.edoctorat.models;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -9,6 +8,8 @@ import java.util.List;
 
 @Entity()
 @Data
+@Table(name = "candidat")
+
 public class CandidatModel {
 
     @Id
@@ -35,10 +36,14 @@ public class CandidatModel {
     @ManyToOne
     @JoinColumn(name = "pays_id")
     private PaysModel pays;
-    private int fonctionaire;
+    private boolean fonctionaire;
     @OneToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
     @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DiplomeModel> diplomes;
+    @ManyToOne
+    @JoinColumn(name = "candidat_notification_id")
+    private CandidatNotificationModel candidatNotification;
+
 }
