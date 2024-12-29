@@ -21,6 +21,6 @@ public class CommissionModel {
     @Column(columnDefinition = "TIME(6)", nullable = false)
     private Date heure;
     private long labo_id; //has relation between commission and laboratoire
-    @OneToMany(mappedBy = "commision")
+    @OneToMany(mappedBy = "commission", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommissionProfesseurModel> commissionProfesseurs;
 }

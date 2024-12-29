@@ -21,7 +21,9 @@ public class FormationdoctoraleModel {
     private String axeDeRecherche;
     @Column(columnDefinition = "DATE")
     private Date dateAccreditation;
-    private long ced_id;
+    @ManyToOne
+    @JoinColumn(name = "ced_id")
+    private CedModel ced;
     @Column(length = 10, nullable = false)
-    private String etablissement_id;
+    private String etablissement_id;// has relation with etablissement
 }

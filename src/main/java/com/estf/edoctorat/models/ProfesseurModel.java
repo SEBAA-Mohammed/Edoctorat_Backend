@@ -33,6 +33,8 @@ public class ProfesseurModel {
     @OneToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
-    @OneToMany(mappedBy = "professeur")
+    @OneToMany(mappedBy = "professeur", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommissionProfesseurModel> commissionProfesseurs;
+    @OneToOne(mappedBy = "professeur", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CedModel ced;
 }
