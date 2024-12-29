@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "user_permission")
 public class UserPermissionModel {
 
     @Id
