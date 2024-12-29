@@ -20,12 +20,7 @@ public class CommissionModel {
     private String lieu;
     @Column(columnDefinition = "TIME(6)", nullable = false)
     private Date heure;
-    private long labo_id;
-    @ManyToMany
-    @JoinTable(
-            name = "commission_professeurs",
-            joinColumns = @JoinColumn(name = "professeur_id"),
-            inverseJoinColumns = @JoinColumn(name = "commission_id")
-    )
-    private List<ProfesseurModel> professeurs;
+    private long labo_id; //has relation between commission and laboratoire
+    @OneToMany(mappedBy = "commision")
+    private List<CommissionProfesseurModel> commissionProfesseurs;
 }

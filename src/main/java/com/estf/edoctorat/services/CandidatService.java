@@ -21,7 +21,6 @@ public class CandidatService {
     @Autowired
     private PaysRepository paysRepository;
 
-//    public List<CandidatModel> candidats;
     public List<CandidatModel> getCandidats() {
         return candidatRepository.findAll();
     }
@@ -64,7 +63,7 @@ public class CandidatService {
             candidat.setPathPhoto(updatedCandidat.getPathPhoto());
             candidat.setEtatDossier(updatedCandidat.getEtatDossier());
             candidat.setSituation_familiale(updatedCandidat.getSituation_familiale());
-            candidat.setFonctionaire(updatedCandidat.getFonctionaire());
+            candidat.setFonctionaire(updatedCandidat.isFonctionaire());
 
             if (updatedCandidat.getUser() != null && updatedCandidat.getUser().getId() != null) {
                 Long userId = updatedCandidat.getUser().getId();

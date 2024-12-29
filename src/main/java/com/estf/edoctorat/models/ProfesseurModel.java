@@ -2,7 +2,7 @@ package com.estf.edoctorat.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
+import lombok.*;
 import java.util.List;
 
 @Entity
@@ -11,7 +11,7 @@ import java.util.List;
 public class ProfesseurModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column(length = 30)
     private String cin;
     @Column(length = 30)
@@ -33,6 +33,6 @@ public class ProfesseurModel {
     @OneToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
-    @ManyToMany(mappedBy = "professeurs")
-    private List<CommissionModel> commissions;
+    @OneToMany(mappedBy = "professeur")
+    private List<CommissionProfesseurModel> commissionProfesseurs;
 }

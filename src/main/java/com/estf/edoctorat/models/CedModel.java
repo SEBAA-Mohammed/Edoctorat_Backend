@@ -19,5 +19,5 @@ public class CedModel {
     private String titre;
     @OneToOne
     @JoinColumn(name = "directeur_id")
-    private ProfesseurModel directeur_id;
+    private ProfesseurModel directeur;
 }
