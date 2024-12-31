@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -26,4 +27,6 @@ public class FormationdoctoraleModel {
     private CedModel ced;
     @Column(length = 10, nullable = false)
     private String etablissement_id;// has relation with etablissement
+    @OneToMany(mappedBy = "formationDoctorale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SujetModel> sujets;
 }
