@@ -12,7 +12,7 @@ import java.util.List;
 public class FormationdoctoraleModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     @Column(length = 100)
     private String pathImage;
     private String initiale;
@@ -25,8 +25,11 @@ public class FormationdoctoraleModel {
     @ManyToOne
     @JoinColumn(name = "ced_id")
     private CedModel ced;
-    @Column(length = 10, nullable = false)
-    private String etablissement_id;// has relation with etablissement
+    // @Column(length = 10, nullable = false)
+    // private String etablissement_id;
+    @ManyToOne
+    @JoinColumn(name = "etablissement_id")
+    private EtablissementModel etablissement;
     @OneToMany(mappedBy = "formationDoctorale", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SujetModel> sujets;
 }

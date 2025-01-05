@@ -26,8 +26,11 @@ public class ProfesseurModel {
     private int nombreEncadre;
     @Column(nullable = false)
     private int nombreProposer;
-    @Column(length = 10, nullable = false)
-    private String etablissement_id;
+    // @Column(length = 10, nullable = false)
+    // private String etablissement_id;
+    @ManyToOne
+    @JoinColumn(name = "etablissement_id")
+    private EtablissementModel etablissement;
     @Column(nullable = false)
     private long labo_id;
     @OneToOne

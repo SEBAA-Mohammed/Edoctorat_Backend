@@ -16,6 +16,10 @@ public class CandidatNotificationModel {
     private String type;
     @OneToMany(mappedBy = "candidatNotification", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CandidatModel> candidats;
-    Long commision_id; // a faire
-    Long sujet_id; // a faire
+    // Long commision_id; // a faire
+    @OneToMany(mappedBy = "candidatNotification", cascade = CascadeType.ALL, orphanRemoval = true) 
+    private List<CommissionModel> commissions;
+    // Long sujet_id; // a faire
+    @OneToMany(mappedBy = "candidatNotification", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SujetModel> sujets;
 }

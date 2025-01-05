@@ -1,6 +1,8 @@
 package com.estf.edoctorat.models;
 
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,4 +15,7 @@ public class EtablissementModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEtablissement ;
     private String nomEtablissement ;
+    @OneToMany
+    @JoinColumn(name = "etablissement_id")
+    private List<FormationdoctoraleModel> formationdoctorales;
 }

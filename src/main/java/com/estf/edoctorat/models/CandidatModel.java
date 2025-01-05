@@ -45,5 +45,7 @@ public class CandidatModel {
     @ManyToOne
     @JoinColumn(name = "candidat_notification_id")
     private CandidatNotificationModel candidatNotification;
+    @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CandidatPostulerModel> candidatPostulers;
 
 }

@@ -1,5 +1,7 @@
 package com.estf.edoctorat.models;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -10,18 +12,23 @@ import lombok.Data;
 public class SujetModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id ;
-    private String titre ;
+    private Long id;
+    private String titre;
     @Column(nullable = true)
-    private String description ;
-    private byte publier ;
+    private String description;
+    private byte publier;
     @OneToOne
-    @JoinColumn(name = "codirecteur_id" , nullable = true)
-    private ProfesseurModel codirecteur ;
+    @JoinColumn(name = "codirecteur_id", nullable = true)
+    private ProfesseurModel codirecteur;
     @ManyToOne
     @JoinColumn(name = "formationDoctorale_id")
-    private FormationdoctoraleModel formationDoctorale ;
+    private FormationdoctoraleModel formationDoctorale;
     @OneToOne
     @JoinColumn(name = "professeur_id")
-    private ProfesseurModel professeur ;
+    private ProfesseurModel professeur;
+    @OneToMany(mappedBy = "sujet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CandidatPostulerModel> candidatPostulers;
+    @ManyToOne
+    @JoinColumn(name = "candidat_notification_id")
+    private CandidatNotificationModel candidatNotification;
 }
