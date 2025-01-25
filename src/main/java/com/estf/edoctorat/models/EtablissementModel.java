@@ -13,7 +13,7 @@ import lombok.Data;
 public class EtablissementModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idEtablissement ;
+    private String idEtablissement ;
     private String nomEtablissement ;
     @OneToMany
     @JoinColumn(name = "etablissement_id")

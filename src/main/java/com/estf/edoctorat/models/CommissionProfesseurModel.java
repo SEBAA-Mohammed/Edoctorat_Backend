@@ -9,7 +9,7 @@ import lombok.Data;
 public class CommissionProfesseurModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @ManyToOne
     private ProfesseurModel professeur;
     @ManyToOne
