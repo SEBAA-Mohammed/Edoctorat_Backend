@@ -25,7 +25,9 @@ public class CommissionModel {
     private LaboratoireModel laboratoire;
     @OneToMany(mappedBy = "commission", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommissionProfesseurModel> commissionProfesseurs;
-    @ManyToOne
-    @JoinColumn(name = "candidat_notification_id")
-    private CandidatNotificationModel candidatNotification;
+    @OneToMany(mappedBy = "commission", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CandidatNotificationModel> notifications;
+
+
+
 }
