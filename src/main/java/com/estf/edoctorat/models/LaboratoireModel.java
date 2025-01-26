@@ -27,5 +27,7 @@ public class LaboratoireModel {
     private ProfesseurModel professeur ;
     @OneToOne
     @JoinColumn( name = "etablissement_id")
-    private EtablissementModel etablissement ;
+    private EtablissementModel etablissement;
+    @OneToOne(mappedBy = "laboratoire", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CommissionModel commission;
 }

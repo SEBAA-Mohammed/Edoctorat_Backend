@@ -42,10 +42,11 @@ public class CandidatModel {
     private UserModel user;
     @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DiplomeModel> diplomes;
-    @ManyToOne
-    @JoinColumn(name = "candidat_notification_id")
-    private CandidatNotificationModel candidatNotification;
+    @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CandidatNotificationModel> notifications;
     @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CandidatPostulerModel> candidatPostulers;
 
 }
+
+

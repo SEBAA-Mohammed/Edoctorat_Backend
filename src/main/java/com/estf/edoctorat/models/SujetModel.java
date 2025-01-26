@@ -28,7 +28,6 @@ public class SujetModel {
     private ProfesseurModel professeur;
     @OneToMany(mappedBy = "sujet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CandidatPostulerModel> candidatPostulers;
-    @ManyToOne
-    @JoinColumn(name = "candidat_notification_id")
-    private CandidatNotificationModel candidatNotification;
+    @OneToMany(mappedBy = "sujet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CandidatNotificationModel> notifications;
 }

@@ -14,12 +14,28 @@ public class CandidatNotificationModel {
     private Long id;
     @Column(nullable = false, length = 255)
     private String type;
-    @OneToMany(mappedBy = "candidatNotification", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CandidatModel> candidats;
-    // Long commision_id; // a faire
-    @OneToMany(mappedBy = "candidatNotification", cascade = CascadeType.ALL, orphanRemoval = true) 
-    private List<CommissionModel> commissions;
-    // Long sujet_id; // a faire
-    @OneToMany(mappedBy = "candidatNotification", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SujetModel> sujets;
+//    @OneToMany
+//    @JoinColumn(name = "candidat_id")
+//    private List<CandidatModel> candidats;
+//
+//    @OneToMany
+//    @JoinColumn(name = "commission_id")
+//    private List<CommissionModel> commissions;
+//
+//    @OneToMany
+//    @JoinColumn(name = "sujet_id")
+//    private List<SujetModel> sujets;
+
+    @ManyToOne
+    @JoinColumn(name = "candidat_id", nullable = false)
+    private CandidatModel candidat;
+
+    @ManyToOne
+    @JoinColumn(name = "commission_id", nullable = false)
+    private CommissionModel commission;
+
+    @ManyToOne
+    @JoinColumn(name = "sujet_id", nullable = false)
+    private SujetModel sujet;
+
 }
