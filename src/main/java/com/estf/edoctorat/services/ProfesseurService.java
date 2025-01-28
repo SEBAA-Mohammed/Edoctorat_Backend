@@ -3,6 +3,7 @@ package com.estf.edoctorat.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.estf.edoctorat.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.estf.edoctorat.models.ProfesseurModel;
@@ -41,4 +42,8 @@ public class ProfesseurService {
             throw new RuntimeException("professeur not found");
         }
     }
+
+    public Optional<ProfesseurModel> getByUser(UserModel user) { return professeurRepository.findByUser(user); }
+
+    public List<ProfesseurModel> getProfesseursByLabID(long id){ return professeurRepository.findByLabo_id(id); }
 }

@@ -21,7 +21,7 @@ public class CandidatController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping()
+    @GetMapping
     public List<CandidatModel> index() {
         return candidatService.getCandidats();
     }

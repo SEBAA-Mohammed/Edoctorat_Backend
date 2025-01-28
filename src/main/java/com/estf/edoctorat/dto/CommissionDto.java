@@ -16,7 +16,7 @@ public class CommissionDto {
 
     private Long id;
     private Date dateCommission;
-    private LocalTime heure;
+    private Date heure;
     private boolean valider;
     private String lieu;
     private Long labo;

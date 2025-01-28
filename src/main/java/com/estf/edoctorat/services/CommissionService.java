@@ -31,7 +31,10 @@ public class CommissionService {
         if(commissionRepository.existsById(id)) {
             commissionRepository.deleteById(id);
         }else {
-            throw new RuntimeException("CED introuvable!");
+            throw new RuntimeException("Commission introuvable!");
         }
     }
+
+    public List<CommissionModel> getByLabID(long id) { return commissionRepository.findByLaboratoire_Id(id); }
+
 }

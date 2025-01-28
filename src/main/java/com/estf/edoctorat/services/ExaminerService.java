@@ -40,4 +40,9 @@ public class ExaminerService {
             throw new RuntimeException("Examination not found");
         }
     }
+
+    public List<ExaminerModel> getByLabID(long id) { return examinerRepository.findByLabo(id); }
+
+    public List<ExaminerModel> getBySujetID(long id) { return examinerRepository.findBySujetID(id); }
+
 }

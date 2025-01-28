@@ -1,5 +1,6 @@
 package com.estf.edoctorat.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,8 @@ public interface ProfesseurRepository extends JpaRepository<ProfesseurModel, Lon
 
     @Query("SELECT p FROM ProfesseurModel p WHERE p.user.email = :email")
     Optional<ProfesseurModel> findByUserEmail(@Param("email") String email);
+
+    @Query("SELECT p FROM ProfesseurModel p WHERE p.labo_id = :labID")
+    List<ProfesseurModel> findByLabo_id(@Param("labID") Long labID);
+
 }

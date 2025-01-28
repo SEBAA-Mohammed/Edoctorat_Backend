@@ -63,7 +63,7 @@ public class CandidatService {
             candidat.setPathPhoto(updatedCandidat.getPathPhoto());
             candidat.setEtatDossier(updatedCandidat.getEtatDossier());
             candidat.setSituation_familiale(updatedCandidat.getSituation_familiale());
-            candidat.setFonctionaire(updatedCandidat.isFonctionaire());
+            candidat.setFonctionaire(updatedCandidat.getFonctionaire());
 
             if (updatedCandidat.getUser() != null && updatedCandidat.getUser().getId() != null) {
                 Long userId = updatedCandidat.getUser().getId();

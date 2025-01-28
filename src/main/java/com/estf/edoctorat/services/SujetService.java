@@ -40,4 +40,7 @@ public class SujetService {
             throw new RuntimeException("sujet not found");
         }
     }
+
+    public List<SujetModel> getSujetsByProfID(long id) { return sujetRepository.findSujetByProfesseur_Id(id); }
+
 }

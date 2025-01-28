@@ -16,7 +16,7 @@ public class ExaminerModel {
     private float noteDossier ;
     @Column(length = 11, nullable = false)
     private int noteEntretien ;
-    private byte publier ;
+    private Boolean publier ;
     @OneToOne
     @JoinColumn(name = "commission_id")
     private CommissionModel commission ;
@@ -26,5 +26,5 @@ public class ExaminerModel {
     @OneToOne
     @JoinColumn(name = "candidat_id")
     private CandidatModel candidat ;
-    private byte valider ;
+    private Boolean valider ;
 }

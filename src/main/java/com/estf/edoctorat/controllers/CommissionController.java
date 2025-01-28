@@ -1,20 +1,24 @@
 package com.estf.edoctorat.controllers;
 
+import com.estf.edoctorat.config.CustomUserDetails;
 import com.estf.edoctorat.dto.CommissionCreationDto;
+import com.estf.edoctorat.dto.CommissionDto;
 import com.estf.edoctorat.mappers.CommissionDtoMapper;
 import com.estf.edoctorat.models.CommissionModel;
 import com.estf.edoctorat.models.CommissionProfesseurModel;
-import com.estf.edoctorat.models.ProfesseurModel;
-import com.estf.edoctorat.services.CommissionProfesseurService;
-import com.estf.edoctorat.services.CommissionService;
-import com.estf.edoctorat.services.LaboratoireService;
-import com.estf.edoctorat.services.ProfesseurService;
+import com.estf.edoctorat.models.UserModel;
+import com.estf.edoctorat.services.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/commision/")
+@RequestMapping("/api")
 public class CommissionController {
 
     @Autowired
@@ -29,8 +33,11 @@ public class CommissionController {
     @Autowired
     private CommissionProfesseurService commissionProfesseurService;
 
+    @Autowired
+    private SujetService sujetService;
 
-    @PostMapping
+
+    @PostMapping("/commission/")
     @ResponseBody
     public ResponseEntity<CommissionModel> addCommission(@RequestBody CommissionCreationDto commissionDto){
 
@@ -43,6 +50,42 @@ public class CommissionController {
                 .forEach(prof -> commissionProfesseurService.create(new CommissionProfesseurModel(prof, savedComm)));
 
         return ResponseEntity.ok(savedComm);
+
+    }
+
+    @GetMapping("/commission/")
+    @ResponseBody
+    public List<CommissionDto> getComissions(HttpServletRequest request){
+
+        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+        UserModel user = ((CustomUserDetails) userDetails).getUser();
+
+        long idLab = professeurService.getByUser(user).get().getLabo_id();
+
+        List<CommissionModel> listCommissions = commissionService.getByLabID(idLab);
+
+        List<CommissionDto> listCommDto = listCommissions.stream()
+                .map( commission -> CommissionDtoMapper.toDto(commission, sujetService) )
+                .toList();
+
+        return listCommDto;
+
+    }
+
+    @DeleteMapping("/commission/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteCommission(@PathVariable long id){
+
+        try{
+
+            commissionService.delete(id);
+            return ResponseEntity.ok("Commission supprimer avec succés");
+
+        }catch (Exception e){
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
+        }
 
     }
 
