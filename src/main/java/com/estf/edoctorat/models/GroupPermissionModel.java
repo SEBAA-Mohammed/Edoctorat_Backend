@@ -12,7 +12,11 @@ public class GroupPermissionModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long groupId;// to do
+
+    @ManyToOne
+    @JoinColumn(name = "group_id", nullable = false)
+    private AuthGroupModel group;
+
 
     @ManyToOne
     @JoinColumn(name = "permission_id", nullable = false)
