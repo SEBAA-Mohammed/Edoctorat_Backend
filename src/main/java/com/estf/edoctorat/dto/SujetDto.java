@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 public class SujetDto {
 
     private Long id;
-    private String titre;
-    private String description;
-    private Byte publier;
-    private ProfesseurDto codirecteur;
-    private FormationdoctoraleModel formationDoctorale;
     private ProfesseurDto professeur;
+    private FormationdoctoraleModel formationDoctorale;
+    private String titre;
+    private ProfesseurDto codirecteur;
+    private String description;
+    private boolean publier;
 
 
 }
