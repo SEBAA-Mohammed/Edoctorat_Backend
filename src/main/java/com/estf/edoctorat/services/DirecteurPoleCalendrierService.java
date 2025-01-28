@@ -5,6 +5,7 @@ import com.estf.edoctorat.repositories.DirecteuPoleCalendrierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +34,14 @@ public class DirecteurPoleCalendrierService {
         }else {
             throw new RuntimeException("Element introuvable!");
         }
+    }
+
+    public Optional<DirecteurPoleCalendrierModel> updateCalendrier(int calendrierId, Date dateDebut, Date dateFin) {
+        return directeuPoleCalendrierRepository.findById(calendrierId).map(calendrier -> {
+            calendrier.setDateDebut(dateDebut);
+            calendrier.setDateFin(dateFin);
+            return directeuPoleCalendrierRepository.save(calendrier);
+        });
     }
 
 }

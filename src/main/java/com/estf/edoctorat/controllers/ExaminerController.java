@@ -28,6 +28,11 @@ public class ExaminerController {
     @Autowired
     private ProfesseurService professeurService;
 
+    @GetMapping("examiner/")
+    public List<ExaminerModel> index(){
+        return examinerService.getAll();
+    }
+
     @GetMapping("/labo_candidat/")
     @ResponseBody
     public List<ExaminerDto> getCandidats(HttpServletRequest request){
