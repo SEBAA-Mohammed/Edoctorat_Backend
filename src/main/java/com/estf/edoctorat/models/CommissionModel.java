@@ -1,14 +1,20 @@
 package com.estf.edoctorat.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "commission")
 public class CommissionModel {
     @Id
@@ -28,6 +34,15 @@ public class CommissionModel {
     @OneToMany(mappedBy = "commission", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CandidatNotificationModel> notifications;
 
+
+    public CommissionModel(Date dateCommission, Date heure, String lieu, LaboratoireModel laboratoire, List<CommissionProfesseurModel> commissionProfesseurs){
+        this.dateCommission = dateCommission;
+        this.heure = heure;
+        this.lieu = lieu;
+        this.laboratoire = laboratoire;
+        this.commissionProfesseurs = commissionProfesseurs;
+        this.notifications = new ArrayList<>();
+    }
 
 
 }

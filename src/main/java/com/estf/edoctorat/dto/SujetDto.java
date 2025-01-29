@@ -1,6 +1,5 @@
 package com.estf.edoctorat.dto;
 
-import com.estf.edoctorat.models.FormationdoctoraleModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,12 +11,11 @@ import lombok.NoArgsConstructor;
 public class SujetDto {
 
     private Long id;
-    private String titre;
-    private String description;
-    private Byte publier;
-    private ProfesseurDto codirecteur;
-    private FormationdoctoraleModel formationDoctorale;
     private ProfesseurDto professeur;
-
+    private FormationdoctoraleDto formationDoctorale;
+    private String titre;
+    private ProfesseurDto codirecteur;
+    private String description;
+    private Boolean publier;
 
 }

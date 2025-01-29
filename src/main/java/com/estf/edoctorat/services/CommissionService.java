@@ -1,9 +1,13 @@
 package com.estf.edoctorat.services;
 
+import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.models.CedModel;
 import com.estf.edoctorat.models.CommissionModel;
+import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.CommissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +35,19 @@ public class CommissionService {
         if(commissionRepository.existsById(id)) {
             commissionRepository.deleteById(id);
         }else {
-            throw new RuntimeException("CED introuvable!");
+            throw new RuntimeException("Commission introuvable!");
         }
+    }
+
+    public List<CommissionModel> getByLabID(long id) { return commissionRepository.findByLaboratoire_Id(id); }
+
+    public Page<CommissionModel> getByLabID(long id, int limit, int offset) { return commissionRepository.findByLaboratoire_Id(id, PageRequest.of(offset/limit, limit)); }
+
+    public Page<CommissionModel> getAll(int limit, int offset) { return commissionRepository.findAll(PageRequest.of(offset/limit, limit)); }
+
+    public Page<CommissionModel> getCommissionByCed(UserModel currentUser, int limit, int offset) {
+        long idCed = currentUser.getProfesseur().getCed().getId();
+
+        return commissionRepository.findByCedId(idCed, PageRequest.of(offset / limit, limit));
     }
 }

@@ -40,4 +40,5 @@ public class LaboratoireService {
             throw new RuntimeException("laboratoire not found");
         }
     }
+
 }

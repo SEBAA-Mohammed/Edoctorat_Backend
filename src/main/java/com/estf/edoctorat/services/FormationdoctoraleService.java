@@ -3,6 +3,8 @@ package com.estf.edoctorat.services;
 import com.estf.edoctorat.models.FormationdoctoraleModel;
 import com.estf.edoctorat.repositories.FormationdoctoraleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,7 +16,9 @@ public class FormationdoctoraleService {
     @Autowired
     private FormationdoctoraleRepository formationdoctoraleRepository;
 
-    public List<FormationdoctoraleModel> getAll() { return formationdoctoraleRepository.findAll(); }
+    public Page<FormationdoctoraleModel> getAll(int limit, int offset) {
+        return formationdoctoraleRepository.findAll(PageRequest.of(offset / limit, limit));
+    }
 
     public Optional<FormationdoctoraleModel> getById(long id) { return formationdoctoraleRepository.findById(id); }
 

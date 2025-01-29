@@ -2,11 +2,14 @@ package com.estf.edoctorat.services;
 
 import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.models.PaysModel;
+import com.estf.edoctorat.models.SujetModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.CandidatRepository;
 import com.estf.edoctorat.repositories.PaysRepository;
 import com.estf.edoctorat.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -63,7 +66,7 @@ public class CandidatService {
             candidat.setPathPhoto(updatedCandidat.getPathPhoto());
             candidat.setEtatDossier(updatedCandidat.getEtatDossier());
             candidat.setSituation_familiale(updatedCandidat.getSituation_familiale());
-            candidat.setFonctionaire(updatedCandidat.isFonctionaire());
+            candidat.setFonctionaire(updatedCandidat.getFonctionaire());
 
             if (updatedCandidat.getUser() != null && updatedCandidat.getUser().getId() != null) {
                 Long userId = updatedCandidat.getUser().getId();
@@ -86,6 +89,12 @@ public class CandidatService {
 
             return candidatRepository.save(candidat);
         }).orElseThrow(() -> new RuntimeException("Candidat not found with id " + id));
+    }
+
+    public Page<CandidatModel> getCandidatByCed(UserModel currentUser, int limit, int offset) {
+        long idCed = currentUser.getProfesseur().getCed().getId();
+
+        return candidatRepository.findByCedId(idCed, PageRequest.of(offset / limit, limit));
     }
 
 

@@ -1,5 +1,6 @@
 package com.estf.edoctorat.mappers;
 
+import com.estf.edoctorat.dto.ProfesseurDto;
 import com.estf.edoctorat.dto.SujetDto;
 import com.estf.edoctorat.models.SujetModel;
 
@@ -9,12 +10,12 @@ public class SujetDtoMapper {
 
         return new SujetDto(
                 sujet.getId(),
+                ProfesseurDtoMapper.toDto(sujet.getProfesseur()),
+                FormationdoctoraleDtoMapper.toDto(sujet.getFormationDoctorale()),
                 sujet.getTitre(),
-                sujet.getDescription(),
-                sujet.getPublier(),
                 sujet.getCodirecteur() != null ? ProfesseurDtoMapper.toDto(sujet.getCodirecteur()) : null,
-                sujet.getFormationDoctorale(),
-                ProfesseurDtoMapper.toDto(sujet.getProfesseur())
+                sujet.getDescription(),
+                sujet.getPublier()
         );
 
     }

@@ -3,7 +3,9 @@ package com.estf.edoctorat.models;
 import java.util.List;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -16,7 +18,7 @@ public class SujetModel {
     private String titre;
     @Column(nullable = true)
     private String description;
-    private byte publier;
+    private Boolean publier;
     @OneToOne
     @JoinColumn(name = "codirecteur_id", nullable = true)
     private ProfesseurModel codirecteur;
