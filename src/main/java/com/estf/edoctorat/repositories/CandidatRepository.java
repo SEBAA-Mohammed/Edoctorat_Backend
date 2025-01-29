@@ -18,7 +18,6 @@ public interface CandidatRepository extends JpaRepository<CandidatModel, Long> {
     List<CandidatModel> findByNomCandidatAr(String name);
 
     Optional<CandidatModel> findByUser(UserModel user);
-
-    @Query("SELECT C FROM CandidatModel C JOIN C.candidatPostulers CP JOIN CP.sujet S JOIN S.formationDoctorale F WHERE F.ced.id = :cedId")
+    @Query("SELECT c FROM CandidatModel c JOIN c.candidatPostulers cp JOIN cp.sujet s JOIN s.formationDoctorale f JOIN f.ced ced WHERE ced.id = :cedId")
     Page<CandidatModel> findByCedId(@Param("cedId") Long cedId, Pageable pageable);
 }
