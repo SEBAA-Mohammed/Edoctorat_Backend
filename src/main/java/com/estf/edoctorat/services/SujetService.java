@@ -47,4 +47,9 @@ public class SujetService {
 
     public List<SujetModel> getSujetsByProfID(long id) { return sujetRepository.findSujetByProfesseur_Id(id); }
 
+    public List<SujetModel> getSujetByCed(UserModel currentUser) {
+        long idCed = currentUser.getProfesseur().getCed().getId();
+
+        return sujetRepository.findByProfesseur_Ced_Id(idCed);
+    }
 }

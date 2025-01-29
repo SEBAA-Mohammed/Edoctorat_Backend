@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -46,6 +47,17 @@ public class SujetController {
 
         return listSujetLabo;
 
+    }
+
+    @GetMapping("/get-ced-sujets/")
+    public List<SujetDto> getSujetsCed(HttpServletRequest request) {
+
+        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
+        List<SujetModel> listSujetCed = sujetService.getSujetByCed(currentUser);
+        return listSujetCed.stream()
+                .map(SujetDtoMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/sujetslabo")
