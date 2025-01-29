@@ -45,9 +45,9 @@ public class CommissionService {
 
     public Page<CommissionModel> getAll(int limit, int offset) { return commissionRepository.findAll(PageRequest.of(offset/limit, limit)); }
 
-    public List<CommissionModel> getCommissionByCed(UserModel currentUser) {
+    public Page<CommissionModel> getCommissionByCed(UserModel currentUser, int limit, int offset) {
         long idCed = currentUser.getProfesseur().getCed().getId();
 
-        return commissionRepository.findByLaboratoire_Ced_Id(idCed);
+        return commissionRepository.findByCedId(idCed, PageRequest.of(offset / limit, limit));
     }
 }

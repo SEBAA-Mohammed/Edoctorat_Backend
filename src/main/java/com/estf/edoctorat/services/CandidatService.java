@@ -92,7 +92,7 @@ public class CandidatService {
     public List<CandidatModel> getCandidatByCed(UserModel currentUser) {
         long idCed = currentUser.getProfesseur().getCed().getId();
 
-        return candidatRepository.findByCandidatPostuler_Sujet_FormationDoctorale_Ced_Id(idCed);
+        return candidatRepository.findByCedId(idCed);
     }
 
 

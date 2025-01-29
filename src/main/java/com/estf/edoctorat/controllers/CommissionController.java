@@ -101,14 +101,19 @@ public class CommissionController {
     }
 
     @GetMapping("/get-ced-commissions/")
-    public List<CommissionModel> getCommissionCed(HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> getCommissionCed(HttpServletRequest request,  @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
-        List<CommissionModel> listCommissions =  commissionService.getCommissionByCed(currentUser);
+        Page<CommissionModel> listCommissions =  commissionService.getCommissionByCed(currentUser, limit, offset);
         List<CommissionDto> listCommDto = listCommissions.stream()
                 .map( commission -> CommissionDtoMapper.toDto(commission, sujetService) )
                 .toList();
-        return commissionService.getCommissionByCed(currentUser);
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", listCommDto.size());
+        response.put("next", listCommissions.hasNext() ? offset + limit : null);
+        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+        response.put("results", listCommDto);
+        return ResponseEntity.ok(response);
     }
 
 

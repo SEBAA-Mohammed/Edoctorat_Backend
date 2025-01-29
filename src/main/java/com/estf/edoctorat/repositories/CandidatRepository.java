@@ -4,6 +4,8 @@ import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.models.UserModel;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,5 +16,6 @@ public interface CandidatRepository extends JpaRepository<CandidatModel, Long> {
     List<CandidatModel> findByNomCandidatAr(String name);
 
     Optional<CandidatModel> findByUser(UserModel user);
-    List<CandidatModel> findByCandidatPostuler_Sujet_FormationDoctorale_Ced_Id(Long cedID);
+    @Query("SELECT c FROM CandidatModel c JOIN c.CandidatPostulerModel cp JOIN cp.SujetModel s JOIN s.FormationDoctoraleModel f JOIN f.CedModel ced WHERE ced.id = :cedId")
+    List<CandidatModel> findByCedId(@Param("cedId") Long cedId);
 }

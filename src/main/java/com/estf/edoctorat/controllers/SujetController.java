@@ -2,7 +2,6 @@ package com.estf.edoctorat.controllers;
 
 
 import com.estf.edoctorat.config.CustomUserDetails;
-import com.estf.edoctorat.dto.ProfesseurDto;
 import com.estf.edoctorat.dto.SujetDto;
 import com.estf.edoctorat.mappers.SujetDtoMapper;
 import com.estf.edoctorat.models.*;
@@ -60,14 +59,23 @@ public class SujetController {
     }
 
     @GetMapping("/get-ced-sujets/")
-    public List<SujetDto> getSujetsCed(HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> getSujetsCed(HttpServletRequest request, @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
 
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
-        List<SujetModel> listSujetCed = sujetService.getSujetByCed(currentUser);
-        return listSujetCed.stream()
+        Page<SujetModel> listSujetCed = sujetService.getSujetByCed(currentUser, limit, offset);
+
+        List<SujetDto> listSujetced =listSujetCed.stream()
                 .map(SujetDtoMapper::toDto)
                 .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", listSujetced.size());
+        response.put("next", listSujetCed.hasNext() ? offset + limit : null);
+        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+        response.put("results", listSujetced);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/sujetslabo")
@@ -77,12 +85,12 @@ public class SujetController {
         return sujetService.create(sujetModel, currentUser);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/sujetslabo/{id}")
     public SujetModel update(@PathVariable long id, @RequestBody SujetModel sujetModel){
         return sujetService.update(id, sujetModel);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/sujetslabo/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id){
         sujetService.delete(id);
         return ResponseEntity.noContent().build();
