@@ -1,6 +1,8 @@
 package com.estf.edoctorat.services;
 
+import com.estf.edoctorat.models.FormationdoctoraleModel;
 import com.estf.edoctorat.models.SujetModel;
+import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.SujetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +25,9 @@ public class SujetService {
         return sujetRepository.findById(id);
     }
 
-    public SujetModel create(SujetModel sujetModel) {
+    public SujetModel create(SujetModel sujetModel , UserModel currentUser) {
+        sujetModel.setProfesseur(currentUser.getProfesseur());
+        sujetModel.setFormationDoctorale((FormationdoctoraleModel) currentUser.getProfesseur().getEtablissement().getFormationdoctorales());
         return sujetRepository.save(sujetModel);
     }
 
@@ -48,4 +52,9 @@ public class SujetService {
 
     public List<SujetModel> getSujetsByProfID(long id) { return sujetRepository.findSujetByProfesseur_Id(id); }
 
+    public List<SujetModel> getSujetByCed(UserModel currentUser) {
+        long idCed = currentUser.getProfesseur().getCed().getId();
+
+        return sujetRepository.findByProfesseur_Ced_Id(idCed);
+    }
 }

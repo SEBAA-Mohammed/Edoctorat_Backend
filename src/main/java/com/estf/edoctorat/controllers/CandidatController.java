@@ -1,19 +1,26 @@
 package com.estf.edoctorat.controllers;
 
+import com.estf.edoctorat.config.CustomUserDetails;
+import com.estf.edoctorat.dto.SujetDto;
+import com.estf.edoctorat.mappers.SujetDtoMapper;
 import com.estf.edoctorat.models.CandidatModel;
+import com.estf.edoctorat.models.SujetModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.UserRepository;
 import com.estf.edoctorat.services.CandidatService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/candidats")
+@RequestMapping("/api")
 public class CandidatController {
 
     @Autowired
@@ -66,5 +73,11 @@ public class CandidatController {
         return "Candidat with ID " + id + " has been deleted!";
     }
 
+    @GetMapping("/get-ced-candidats/")
+    public List<CandidatModel> getCandidatCed(HttpServletRequest request) {
+        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
+        return candidatService.getCandidatByCed(currentUser);
+    }
 
 }

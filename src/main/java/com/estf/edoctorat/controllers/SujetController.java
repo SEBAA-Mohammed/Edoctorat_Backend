@@ -5,10 +5,7 @@ import com.estf.edoctorat.config.CustomUserDetails;
 import com.estf.edoctorat.dto.ProfesseurDto;
 import com.estf.edoctorat.dto.SujetDto;
 import com.estf.edoctorat.mappers.SujetDtoMapper;
-import com.estf.edoctorat.models.PermissionModel;
-import com.estf.edoctorat.models.ProfesseurModel;
-import com.estf.edoctorat.models.SujetModel;
-import com.estf.edoctorat.models.UserModel;
+import com.estf.edoctorat.models.*;
 import com.estf.edoctorat.services.ProfesseurService;
 import com.estf.edoctorat.services.SujetService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/api")
@@ -61,6 +57,35 @@ public class SujetController {
 
         return ResponseEntity.ok(response);
 
+    }
+
+    @GetMapping("/get-ced-sujets/")
+    public List<SujetDto> getSujetsCed(HttpServletRequest request) {
+
+        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
+        List<SujetModel> listSujetCed = sujetService.getSujetByCed(currentUser);
+        return listSujetCed.stream()
+                .map(SujetDtoMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @PostMapping("/sujetslabo")
+    public SujetModel create(@RequestBody SujetModel sujetModel, HttpServletRequest request) {
+        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
+        return sujetService.create(sujetModel, currentUser);
+    }
+
+    @PutMapping("/{id}")
+    public SujetModel update(@PathVariable long id, @RequestBody SujetModel sujetModel){
+        return sujetService.update(id, sujetModel);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable long id){
+        sujetService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 

@@ -15,5 +15,6 @@ public interface SujetRepository extends JpaRepository<SujetModel, Long> {
     Page<SujetModel> findSujetByProfesseur_Id(long profID, Pageable pageable);
 
     List<SujetModel> findSujetByProfesseur_Id(long profID);
+    List<SujetModel> findByProfesseur_Ced_Id(long cedID);
 
 }

@@ -16,5 +16,7 @@ public interface CommissionRepository extends JpaRepository<CommissionModel, Lon
     Page<CommissionModel> findByLaboratoire_Id(long labID, Pageable pageable);
 
     List<CommissionModel> findByLaboratoire_Id(long labID);
+    List<CommissionModel> findByLaboratoire_Ced_Id(long cedID);
+
 
 }

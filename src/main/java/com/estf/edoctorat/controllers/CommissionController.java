@@ -100,6 +100,19 @@ public class CommissionController {
 
     }
 
+    @GetMapping("/get-ced-commissions/")
+    public List<CommissionModel> getCommissionCed(HttpServletRequest request) {
+        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
+        List<CommissionModel> listCommissions =  commissionService.getCommissionByCed(currentUser);
+        List<CommissionDto> listCommDto = listCommissions.stream()
+                .map( commission -> CommissionDtoMapper.toDto(commission, sujetService) )
+                .toList();
+        return commissionService.getCommissionByCed(currentUser);
+    }
+
+
+
 
     @GetMapping("/get-all-commissions/")
     @ResponseBody

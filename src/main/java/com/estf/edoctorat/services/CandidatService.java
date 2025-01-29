@@ -2,6 +2,7 @@ package com.estf.edoctorat.services;
 
 import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.models.PaysModel;
+import com.estf.edoctorat.models.SujetModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.CandidatRepository;
 import com.estf.edoctorat.repositories.PaysRepository;
@@ -86,6 +87,12 @@ public class CandidatService {
 
             return candidatRepository.save(candidat);
         }).orElseThrow(() -> new RuntimeException("Candidat not found with id " + id));
+    }
+
+    public List<CandidatModel> getCandidatByCed(UserModel currentUser) {
+        long idCed = currentUser.getProfesseur().getCed().getId();
+
+        return candidatRepository.findByCandidatPostuler_Sujet_FormationDoctorale_Ced_Id(idCed);
     }
 
 
