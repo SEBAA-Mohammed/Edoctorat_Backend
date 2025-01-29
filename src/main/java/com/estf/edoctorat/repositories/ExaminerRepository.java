@@ -21,6 +21,9 @@ public interface ExaminerRepository extends JpaRepository<ExaminerModel, Long> {
     @Query("select E from ExaminerModel E where E.sujet.id = :sujetID ")
     List<ExaminerModel> findBySujetID(@Param("sujetID") Long sujetID);
 
+    @Query("SELECT e FROM ExaminerModel e JOIN e.sujet s JOIN s.formationDoctorale f JOIN f.ced c WHERE c.id = :cedId")
+    Page<ExaminerModel> findByCedId(@Param("cedId") Long cedId, Pageable pageable);
+
     @Modifying
     @Query("update ExaminerModel E set E.publier = true where E.publier = false and E.valider = true and E.decision = 'Liste d''attente' ")
     void updatePublierListeAttente();

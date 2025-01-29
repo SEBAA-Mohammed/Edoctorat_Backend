@@ -17,8 +17,9 @@ public class ProfesseurService {
     @Autowired
     private ProfesseurRepository professeurRepository;
 
-    public List<ProfesseurModel> getAll() {
-        return professeurRepository.findAll();
+    public Page<ProfesseurModel> getAll(int limit, int offset) {
+
+        return professeurRepository.findAll(PageRequest.of(offset / limit, limit));
     }
 
     public Optional<ProfesseurModel> getById(long id) {

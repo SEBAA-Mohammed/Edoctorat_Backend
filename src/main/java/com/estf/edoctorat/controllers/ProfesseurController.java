@@ -3,6 +3,7 @@ package com.estf.edoctorat.controllers;
 import com.estf.edoctorat.config.CustomUserDetails;
 import com.estf.edoctorat.dto.ProfesseurDto;
 import com.estf.edoctorat.mappers.ProfesseurDtoMapper;
+import com.estf.edoctorat.models.DirecteurPoleCalendrierModel;
 import com.estf.edoctorat.models.ProfesseurModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.services.ProfesseurService;
@@ -25,13 +26,20 @@ public class ProfesseurController {
 
     @GetMapping("/get-professeurs")
     @ResponseBody
-    public List<ProfesseurDto> getAllProfesseur(){
+    public ResponseEntity<Map<String, Object>> getAllProfesseur(@RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset){
 
-        List<ProfesseurModel> listProf = professeurService.getAll();
+        Page<ProfesseurModel> listProf = professeurService.getAll(limit, offset);
 
-        return listProf.stream()
+        listProf.stream()
                 .map(ProfesseurDtoMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", listProf.getTotalElements());
+        response.put("next", listProf.hasNext() ? offset + limit : null);
+        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+        response.put("results", listProf);
+        return ResponseEntity.ok(response);
 
     }
 

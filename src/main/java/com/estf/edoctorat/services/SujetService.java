@@ -52,10 +52,10 @@ public class SujetService {
 
     public List<SujetModel> getSujetsByProfID(long id) { return sujetRepository.findSujetByProfesseur_Id(id); }
 
-    public List<SujetModel> getSujetByCed(UserModel currentUser) {
+    public Page<SujetModel> getSujetByCed(UserModel currentUser, int limit, int offset) {
         long idCed = currentUser.getProfesseur().getCed().getId();
 
-        return sujetRepository.findByProfesseur_Ced_Id(idCed);
+        return sujetRepository.findByCedId(idCed, PageRequest.of(offset / limit, limit));
     }
 
     public void publierSujets() {

@@ -1,6 +1,7 @@
 package com.estf.edoctorat.services;
 
 import com.estf.edoctorat.models.ExaminerModel;
+import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.ExaminerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,6 +47,11 @@ public class ExaminerService {
     public Page<ExaminerModel> getByLabID(long id, int limit, int offset) { return examinerRepository.findByLabo(id, PageRequest.of(offset / limit, limit)); }
 
     public List<ExaminerModel> getBySujetID(long id) { return examinerRepository.findBySujetID(id); }
+
+    public Page<ExaminerModel> getByCedID(UserModel currentUser, int limit, int offset ){
+        long idCed = currentUser.getProfesseur().getCed().getId();
+        return examinerRepository.findByCedId(idCed, PageRequest.of(offset / limit, limit));
+    }
 
     public void publierListeAttente() {
 
