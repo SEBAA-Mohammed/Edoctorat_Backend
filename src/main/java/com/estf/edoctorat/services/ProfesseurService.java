@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.estf.edoctorat.models.ProfesseurModel;
 import com.estf.edoctorat.repositories.ProfesseurRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -44,6 +46,8 @@ public class ProfesseurService {
     }
 
     public Optional<ProfesseurModel> getByUser(UserModel user) { return professeurRepository.findByUser(user); }
+
+    public Page<ProfesseurModel> getProfesseursByLabID(long id, int limit, int offset){ return professeurRepository.findByLabo_id(id, PageRequest.of(offset / limit, limit)); }
 
     public List<ProfesseurModel> getProfesseursByLabID(long id){ return professeurRepository.findByLabo_id(id); }
 }

@@ -3,19 +3,26 @@ package com.estf.edoctorat.controllers;
 import com.estf.edoctorat.config.CustomUserDetails;
 import com.estf.edoctorat.dto.ExaminerDto;
 import com.estf.edoctorat.dto.ItemValider;
+import com.estf.edoctorat.dto.PoleAllInscriptionDto;
 import com.estf.edoctorat.dto.PreselectionParSujetDto;
 import com.estf.edoctorat.mappers.ExaminerDtoMapper;
+import com.estf.edoctorat.mappers.PoleAllInscriptionDtoMapper;
 import com.estf.edoctorat.mappers.PreselectionParSujetDtoMapper;
 import com.estf.edoctorat.models.ExaminerModel;
+import com.estf.edoctorat.models.InscriptionModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.services.ExaminerService;
 import com.estf.edoctorat.services.ProfesseurService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -35,18 +42,27 @@ public class ExaminerController {
 
     @GetMapping("/labo_candidat/")
     @ResponseBody
-    public List<ExaminerDto> getCandidats(HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> getCandidats(HttpServletRequest request, @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset){
 
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();
 
         long idLab = professeurService.getByUser(user).get().getLabo_id();
 
-        List<ExaminerModel> examinerLabo = examinerService.getByLabID(idLab);
+        Page<ExaminerModel> examinerLabo = examinerService.getByLabID(idLab, limit, offset);
 
-        return examinerLabo.stream()
+
+        List<ExaminerDto> listExaminer = examinerLabo.getContent().stream()
                 .map(ExaminerDtoMapper::toDto)
                 .toList();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", examinerLabo.getTotalElements());
+        response.put("next", examinerLabo.hasNext() ? offset + limit : null);
+        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+        response.put("results", listExaminer);
+
+        return ResponseEntity.ok(response);
 
     }
 
