@@ -10,12 +10,15 @@ import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.services.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -55,20 +58,28 @@ public class CommissionController {
 
     @GetMapping("/commission/")
     @ResponseBody
-    public List<CommissionDto> getComissions(HttpServletRequest request){
+    public ResponseEntity<Map<String, Object>> getComissions(HttpServletRequest request, @RequestParam(defaultValue = "50") int limit, @RequestParam("0") int offset){
 
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();
 
         long idLab = professeurService.getByUser(user).get().getLabo_id();
 
-        List<CommissionModel> listCommissions = commissionService.getByLabID(idLab);
+        Page<CommissionModel> commissionsPages = commissionService.getByLabID(idLab, limit, offset);
 
-        List<CommissionDto> listCommDto = listCommissions.stream()
+
+        List<CommissionDto> listCommDto = commissionsPages.getContent().stream()
                 .map( commission -> CommissionDtoMapper.toDto(commission, sujetService) )
                 .toList();
 
-        return listCommDto;
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", commissionsPages.getTotalPages());
+        response.put("next", commissionsPages.hasNext() ? offset + limit : null);
+        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+        response.put("results", listCommDto);
+
+
+        return ResponseEntity.ok(response);
 
     }
 
@@ -88,5 +99,27 @@ public class CommissionController {
         }
 
     }
+
+
+    @GetMapping("/get-all-commissions/")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getAllCommissions(@RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
+
+        Page<CommissionModel> commissionsPage = commissionService.getAll(limit, offset);
+
+        List<CommissionDto> listCommissionsDto = commissionsPage.getContent().stream()
+                .map(commission -> CommissionDtoMapper.toDto(commission, sujetService))
+                .toList();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", commissionsPage.getTotalPages());
+        response.put("next", commissionsPage.hasNext() ? offset + limit : null);
+        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+        response.put("results", listCommissionsDto);
+
+        return ResponseEntity.ok(response);
+
+    }
+
 
 }

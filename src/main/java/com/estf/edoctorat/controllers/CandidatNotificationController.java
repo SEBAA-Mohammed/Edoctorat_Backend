@@ -25,7 +25,7 @@ public class CandidatNotificationController {
 
         ExaminerModel examiner = examinerService.getById(id).get();
 
-        String notifType = "entretien";
+        String notifType = "COMMISSION";
 
         CandidatNotificationModel notif = new CandidatNotificationModel( notifType, examiner.getCandidat(), examiner.getCommission(), examiner.getSujet() );
 

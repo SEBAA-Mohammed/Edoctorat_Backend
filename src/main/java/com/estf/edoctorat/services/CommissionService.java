@@ -4,6 +4,8 @@ import com.estf.edoctorat.models.CedModel;
 import com.estf.edoctorat.models.CommissionModel;
 import com.estf.edoctorat.repositories.CommissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,5 +38,9 @@ public class CommissionService {
     }
 
     public List<CommissionModel> getByLabID(long id) { return commissionRepository.findByLaboratoire_Id(id); }
+
+    public Page<CommissionModel> getByLabID(long id, int limit, int offset) { return commissionRepository.findByLaboratoire_Id(id, PageRequest.of(offset/limit, limit)); }
+
+    public Page<CommissionModel> getAll(int limit, int offset) { return commissionRepository.findAll(PageRequest.of(offset/limit, limit)); }
 
 }
