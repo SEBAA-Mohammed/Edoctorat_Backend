@@ -47,4 +47,16 @@ public class ExaminerService {
 
     public List<ExaminerModel> getBySujetID(long id) { return examinerRepository.findBySujetID(id); }
 
+    public void publierListeAttente() {
+
+        examinerRepository.updatePublierListeAttente();
+
+    }
+
+    public void publierListePrincipale(){
+
+        examinerRepository.updatePublierListePrincipale();
+
+    }
+
 }

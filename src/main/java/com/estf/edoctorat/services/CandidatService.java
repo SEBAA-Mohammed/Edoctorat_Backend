@@ -89,11 +89,11 @@ public class CandidatService {
         }).orElseThrow(() -> new RuntimeException("Candidat not found with id " + id));
     }
 
-    public List<CandidatModel> getCandidatByCed(UserModel currentUser) {
-        long idCed = currentUser.getProfesseur().getCed().getId();
-
-        return candidatRepository.findByCandidatPostuler_Sujet_FormationDoctorale_Ced_Id(idCed);
-    }
+//    public List<CandidatModel> getCandidatByCed(UserModel currentUser) {
+//        long idCed = currentUser.getProfesseur().getCed().getId();
+//
+//        return candidatRepository.findByCandidatPostuler_Sujet_FormationDoctorale_Ced_Id(idCed);
+//    }
 
 
 }

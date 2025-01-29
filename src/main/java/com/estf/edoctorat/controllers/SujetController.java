@@ -11,6 +11,7 @@ import com.estf.edoctorat.services.SujetService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -77,16 +78,29 @@ public class SujetController {
         return sujetService.create(sujetModel, currentUser);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/sujet/{id}")
     public SujetModel update(@PathVariable long id, @RequestBody SujetModel sujetModel){
         return sujetService.update(id, sujetModel);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/sujet/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id){
         sujetService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/publier-sujets/")
+    @ResponseBody
+    public ResponseEntity<String> publierSujets(){
+
+        try {
+            sujetService.publierSujets();
+            return ResponseEntity.ok("Sujets publiés avec succès !");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de la publication des sujets.");
+        }
+
+    }
 
 }

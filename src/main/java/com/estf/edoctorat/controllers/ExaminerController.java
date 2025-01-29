@@ -90,4 +90,23 @@ public class ExaminerController {
 
     }
 
+
+    @PostMapping("/publier-liste-attente/")
+    @ResponseBody
+    public ResponseEntity<?> publierListeAttente(){
+
+        examinerService.publierListeAttente();
+        return ResponseEntity.ok("List d'attente publier avec succés!");
+
+    }
+
+    @PostMapping("/publier-liste-principale/")
+    @ResponseBody
+    public ResponseEntity<?> publierListePrincipale(){
+
+        examinerService.publierListePrincipale();
+        return ResponseEntity.ok("List principale publier avec succés!");
+
+    }
+
 }

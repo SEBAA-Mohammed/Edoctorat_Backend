@@ -73,11 +73,11 @@ public class CandidatController {
         return "Candidat with ID " + id + " has been deleted!";
     }
 
-    @GetMapping("/get-ced-candidats/")
-    public List<CandidatModel> getCandidatCed(HttpServletRequest request) {
-        UserDetails userDetails = (UserDetails) request.getAttribute("user");
-        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
-        return candidatService.getCandidatByCed(currentUser);
-    }
+//    @GetMapping("/get-ced-candidats/")
+//    public List<CandidatModel> getCandidatCed(HttpServletRequest request) {
+//        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+//        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
+//        return candidatService.getCandidatByCed(currentUser);
+//    }
 
 }

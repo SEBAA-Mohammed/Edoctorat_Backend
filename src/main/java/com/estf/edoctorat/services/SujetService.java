@@ -57,4 +57,14 @@ public class SujetService {
 
         return sujetRepository.findByProfesseur_Ced_Id(idCed);
     }
+
+    public void publierSujets() {
+        List<SujetModel> sujets = sujetRepository.findAll();
+
+        for (SujetModel sujet : sujets) {
+            sujet.setPublier(true);
+            sujetRepository.save(sujet);
+        }
+    }
+
 }
