@@ -3,6 +3,8 @@ package com.estf.edoctorat.services;
 import com.estf.edoctorat.models.DirecteurPoleCalendrierModel;
 import com.estf.edoctorat.repositories.DirecteuPoleCalendrierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,7 +17,9 @@ public class DirecteurPoleCalendrierService {
     @Autowired
     private DirecteuPoleCalendrierRepository directeuPoleCalendrierRepository;
 
-    public List<DirecteurPoleCalendrierModel> getAll() { return directeuPoleCalendrierRepository.findAll(); }
+    public Page<DirecteurPoleCalendrierModel> getAll(int limit, int offset) {
+        return directeuPoleCalendrierRepository.findAll(PageRequest.of(offset / limit, limit));
+    }
 
     public Optional<DirecteurPoleCalendrierModel> getById(int id) { return directeuPoleCalendrierRepository.findById(id); }
 

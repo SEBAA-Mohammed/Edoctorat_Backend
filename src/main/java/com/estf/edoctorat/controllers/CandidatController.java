@@ -4,18 +4,22 @@ import com.estf.edoctorat.config.CustomUserDetails;
 import com.estf.edoctorat.dto.SujetDto;
 import com.estf.edoctorat.mappers.SujetDtoMapper;
 import com.estf.edoctorat.models.CandidatModel;
+import com.estf.edoctorat.models.CommissionModel;
 import com.estf.edoctorat.models.SujetModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.UserRepository;
 import com.estf.edoctorat.services.CandidatService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -74,10 +78,16 @@ public class CandidatController {
     }
 
     @GetMapping("/get-ced-candidats/")
-    public List<CandidatModel> getCandidatCed(HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> getCandidatCed(HttpServletRequest request,  @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
-        return candidatService.getCandidatByCed(currentUser);
+        Page<CandidatModel> listCandidats =  candidatService.getCandidatByCed(currentUser, limit, offset);
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", listCandidats.getTotalElements());
+        response.put("next", listCandidats.hasNext() ? offset + limit : null);
+        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+        response.put("results", listCandidats);
+        return ResponseEntity.ok(response);
     }
 
 }
