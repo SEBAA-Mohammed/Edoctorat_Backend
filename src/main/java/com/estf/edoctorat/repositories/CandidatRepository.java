@@ -14,4 +14,5 @@ public interface CandidatRepository extends JpaRepository<CandidatModel, Long> {
     List<CandidatModel> findByNomCandidatAr(String name);
 
     Optional<CandidatModel> findByUser(UserModel user);
+    List<CandidatModel> findByCandidatPostuler_Sujet_FormationDoctorale_Ced_Id(Long cedID);
 }
