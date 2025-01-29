@@ -1,7 +1,9 @@
 package com.estf.edoctorat.services;
 
+import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.models.CedModel;
 import com.estf.edoctorat.models.CommissionModel;
+import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.CommissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,4 +39,9 @@ public class CommissionService {
 
     public List<CommissionModel> getByLabID(long id) { return commissionRepository.findByLaboratoire_Id(id); }
 
+    public List<CommissionModel> getCommissionByCed(UserModel currentUser) {
+        long idCed = currentUser.getProfesseur().getCed().getId();
+
+        return commissionRepository.findByLaboratoire_Ced_Id(idCed);
+    }
 }

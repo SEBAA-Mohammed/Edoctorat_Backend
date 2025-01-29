@@ -11,5 +11,7 @@ import java.util.List;
 public interface CommissionRepository extends JpaRepository<CommissionModel, Long> {
 
     List<CommissionModel> findByLaboratoire_Id(long labID);
+    List<CommissionModel> findByLaboratoire_Ced_Id(long cedID);
+
 
 }

@@ -4,6 +4,7 @@ import com.estf.edoctorat.config.CustomUserDetails;
 import com.estf.edoctorat.dto.CommissionCreationDto;
 import com.estf.edoctorat.dto.CommissionDto;
 import com.estf.edoctorat.mappers.CommissionDtoMapper;
+import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.models.CommissionModel;
 import com.estf.edoctorat.models.CommissionProfesseurModel;
 import com.estf.edoctorat.models.UserModel;
@@ -88,5 +89,18 @@ public class CommissionController {
         }
 
     }
+
+    @GetMapping("/get-ced-commissions/")
+    public List<CommissionModel> getCommissionCed(HttpServletRequest request) {
+        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
+        List<CommissionModel> listCommissions =  commissionService.getCommissionByCed(currentUser);
+        List<CommissionDto> listCommDto = listCommissions.stream()
+                .map( commission -> CommissionDtoMapper.toDto(commission, sujetService) )
+                .toList();
+        return commissionService.getCommissionByCed(currentUser);
+    }
+
+
 
 }
