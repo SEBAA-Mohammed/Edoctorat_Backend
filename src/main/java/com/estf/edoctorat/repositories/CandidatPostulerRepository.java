@@ -7,10 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import com.estf.edoctorat.models.CandidatPostulerModel;
 
+import java.util.List;
+
 @Repository
 
 
 public interface CandidatPostulerRepository extends JpaRepository<CandidatPostulerModel, Long> {
 
-
+    List<CandidatPostulerModel> findBySujetProfesseurId(Long professorId);
 }
