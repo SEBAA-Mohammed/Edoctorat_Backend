@@ -8,7 +8,6 @@ import com.estf.edoctorat.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,18 +94,6 @@ public class OperationsService {
         }
         sujetRepo.deleteById(id);
     }
-//
-//    public Page<InscriptionDto> getMesInscrits(int offset) {
-//        PageRequest pageRequest = PageRequest.of(offset, 50);
-//        return inscriptionRepo.findAll(pageRequest)
-//                .map(this::mapToInscriptionDto);
-//    }
-//
-//    public Page<ExaminerDto> getResultats(int offset) {
-//        PageRequest pageRequest = PageRequest.of(offset, 50);
-//        return examinerRepo.findAll(pageRequest)
-//                .map(this::mapToExaminerDto);
-//    }
 
     // Mapping methods
     private FormationdoctoraleDto mapToFormationDoctoraleDto(FormationdoctoraleModel model) {
