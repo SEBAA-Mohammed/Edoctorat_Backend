@@ -14,15 +14,36 @@ import java.util.stream.Collectors;
 
 @Component
 public class SujetMapper {
-    public static Sujet2Dto toDto(SujetModel sujet) {
+    public static SujetModel toEntity(Sujet2Dto dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        SujetModel sujet = new SujetModel();
+        sujet.setId(dto.getId());
+        sujet.setTitre(dto.getTitre());
+        sujet.setDescription(dto.getDescription());
+        sujet.setProfesseur(dto.getProfesseur());
+        sujet.setCodirecteur(dto.getCoDirecteur());
+        sujet.setFormationDoctorale(dto.getFormationDoctorale());
+        sujet.setPublier(dto.isPublier());
+
+        return sujet;
+    }
+
+    public static Sujet2Dto toDto(SujetModel model) {
+        if (model == null) {
+            return null;
+        }
+
         return new Sujet2Dto(
-                sujet.getId(),
-                sujet.getProfesseur(),
-                sujet.getCodirecteur(),
-                sujet.getTitre(),
-                sujet.getDescription(),
-                sujet.getFormationDoctorale(),
-                sujet.getPublier() == 1
+                model.getId(),
+                model.getProfesseur(),
+                model.getCodirecteur(),
+                model.getTitre(),
+                model.getDescription(),
+                model.getFormationDoctorale(),
+                model.getPublier()
         );
     }
 

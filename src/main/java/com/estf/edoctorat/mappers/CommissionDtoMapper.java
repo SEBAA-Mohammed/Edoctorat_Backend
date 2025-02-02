@@ -17,7 +17,6 @@ import java.util.List;
 public class CommissionDtoMapper {
 
 
-
     public static CommissionModel toCommission(CommissionCreationDto dto, LaboratoireService laboServ){
 
         LaboratoireModel labo = laboServ.getById(dto.getLabo_id()).get();

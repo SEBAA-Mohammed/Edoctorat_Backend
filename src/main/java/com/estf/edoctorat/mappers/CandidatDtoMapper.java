@@ -5,6 +5,11 @@ import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.services.UserService;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 public class CandidatDtoMapper {
 
     public static CandidatDto toDto(CandidatModel candidat){
@@ -38,6 +43,54 @@ public class CandidatDtoMapper {
                 candidat.getFonctionaire().toString()
         );
 
+    }
+    public static CandidatModel toEntity(CandidatDto dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        CandidatModel candidat = new CandidatModel();
+        candidat.setId(dto.getId());
+        candidat.setCne(dto.getCne());
+        candidat.setCni(dto.getCin());
+        candidat.setNomCandidatAr(dto.getNomCandidatAr());
+        candidat.setPrenomCandidatAr(dto.getPrenomCandidatAr());
+        candidat.setAdresse(dto.getAdresse());
+        candidat.setAdresseAr(dto.getAdresseAr());
+        candidat.setSexe(dto.getSexe());
+        candidat.setVilleDeNaissance(dto.getVilleDeNaissance());
+        candidat.setVilleDeNaissanceAr(dto.getVilleDeNaissanceAr());
+        candidat.setVille(dto.getVille());
+
+        // Handle date conversion
+        if (dto.getDateDeNaissance() != null) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+                LocalDateTime localDateTime = LocalDateTime.parse(dto.getDateDeNaissance(), formatter);
+
+                // Convert LocalDateTime to Instant, then to Date
+                Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+                candidat.setDateDeNaissance(date);
+            } catch (Exception e) {
+                // For debugging
+            }
+        }
+
+
+        candidat.setTypeDeHandicape(dto.getTypeDeHandicape());
+        candidat.setAcademie(dto.getAcademie());
+        candidat.setTelCandidat(dto.getTelCandidat());
+        candidat.setPathCv(dto.getPathCv());
+        candidat.setPathPhoto(dto.getPathPhoto());
+        candidat.setEtatDossier(dto.getEtatDossier());
+        candidat.setSituation_familiale(dto.getSituation_familiale());
+        candidat.setFonctionaire("Oui".equalsIgnoreCase(dto.getFonctionnaire()));
+
+        // Note: You'll need to set up the User and Pays relationships separately
+        // as they require fetching from their respective repositories
+
+        return candidat;
     }
 
 }
