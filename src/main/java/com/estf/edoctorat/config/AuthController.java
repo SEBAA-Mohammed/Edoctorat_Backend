@@ -2,12 +2,15 @@ package com.estf.edoctorat.config;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,23 +27,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.estf.edoctorat.dto.LoginRequest;
+import com.estf.edoctorat.dto.PreRegisterRequest;
 import com.estf.edoctorat.models.AuthGroupModel;
 import com.estf.edoctorat.models.CandidatModel;
 import com.estf.edoctorat.models.PaysModel;
 import com.estf.edoctorat.models.ProfesseurModel;
+import com.estf.edoctorat.models.TokenConfirmation;
+import com.estf.edoctorat.models.UserGroupModel;
 import com.estf.edoctorat.models.UserModel;
-import com.estf.edoctorat.repositories.CandidatRepository;
-import com.estf.edoctorat.repositories.PaysRepository;
-import com.estf.edoctorat.repositories.ProfesseurRepository;
-import com.estf.edoctorat.repositories.UserRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Cookie;
+import com.estf.edoctorat.repositories.*;
 
 @RestController
 @RequestMapping("/api")
@@ -60,25 +64,33 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
-    private PaysRepository paysRepository;
-    @Autowired
     private CandidatRepository candidatRepository;
+
+    @Autowired
+    private PaysRepository paysRepository;
+
+    @Autowired
+    private TokenConfirmationRepository tokenConfirmationRepository;
+
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserGroupRepository userGroupRepository;
 
     private GoogleIdToken.Payload verifyGoogleToken(String idTokenString) throws GeneralSecurityException, IOException {
         return googleTokenVerifier.verify(idTokenString);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/token/")
     public ResponseEntity<?> authenticate(
             @RequestBody LoginRequest request,
             HttpServletResponse response) {
         try {
             UserModel user = userRepository.findByEmail(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
             String token = jwtService.generateToken(userDetails);
@@ -95,8 +107,7 @@ public class AuthController {
             response.setHeader("Authorization", "Bearer " + token);
 
             return ResponseEntity.ok()
-                .header("Access-Control-Expose-Headers", "Authorization")
-                .body(new AuthResponse(token, refreshToken, createUserInfo(user)));
+                    .body(new AuthResponse(token, refreshToken, createUserInfo(user)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
@@ -110,7 +121,7 @@ public class AuthController {
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(0);
         response.addCookie(jwtCookie);
-        
+
         return ResponseEntity.ok().body("Logged out successfully");
     }
 
@@ -179,7 +190,7 @@ public class AuthController {
                 misc);
     }
 
-    @PostMapping("/verify-is-prof")
+    @PostMapping("/verify-is-prof/")
     public ResponseEntity<?> verifyProfessor(@RequestBody Map<String, String> request) {
         try {
             String idTokenString = request.get("idToken");
@@ -199,27 +210,42 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    @PostMapping("/register/candidat/")
+    public ResponseEntity<?> registerCandidat(@RequestBody RegisterRequest request) {
         try {
-            // Check if user exists
-            if (userRepository.existsByEmail(request.getEmail())) {
-                return ResponseEntity.badRequest().body("Email already exists");
-            }
+            // Find or create user
+            UserModel user = userRepository.findByEmail(request.getEmail())
+                    .map(existingUser -> {
+                        existingUser.setIs_active(true);
+                        existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+                        existingUser.setFirst_name(request.getPrenom());
+                        existingUser.setLast_name(request.getNom());
+                        return existingUser;
+                    })
+                    .orElseGet(() -> {
+                        UserModel newUser = new UserModel();
+                        newUser.setEmail(request.getEmail());
+                        newUser.setUsername(request.getEmail());
+                        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+                        newUser.setIs_active(true);
+                        newUser.setDate_joined(new Date());
+                        newUser.setFirst_name(request.getPrenom());
+                        newUser.setLast_name(request.getNom());
+                        return newUser;
+                    });
 
-            // Create user
-            UserModel user = new UserModel();
-            user.setEmail(request.getEmail());
-            user.setUsername(request.getEmail()); // Use email as username
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setIs_active(true);
-            user.setDate_joined(new Date());
-            user.setFirst_name(request.getPrenom());
-            user.setLast_name(request.getNom());
-            
-            // Save user first
+            UserGroupModel userGroup = userGroupRepository.findById(1L)
+                    .orElseThrow(() -> new RuntimeException("Default candidat group not found"));
+            user.setUserGroup(userGroup);
+
             user = userRepository.save(user);
-            System.out.println("User registered with email: " + user.getEmail());
+
+            PaysModel pays = paysRepository.findByNom(request.getPays())
+                    .orElseGet(() -> {
+                        PaysModel newPays = new PaysModel();
+                        newPays.setNom(request.getPays());
+                        return paysRepository.save(newPays);
+                    });
 
             // Create candidat
             CandidatModel candidat = new CandidatModel();
@@ -236,16 +262,10 @@ public class AuthController {
             candidat.setDateDeNaissance(request.getDateDeNaissance());
             candidat.setTypeDeHandicape(request.getTypeDeHandiCape());
             candidat.setSituation_familiale(request.getSituationfamiliale());
-
-            if (request.getPays() != null) {
-                PaysModel pays = paysRepository.findById(request.getPays())
-                        .orElseThrow(() -> new RuntimeException("Pays not found"));
-                candidat.setPays(pays);
-            }
+            candidat.setPays(pays);
 
             candidat = candidatRepository.save(candidat);
 
-            // Generate tokens
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
             String token = jwtService.generateToken(userDetails);
             String refreshToken = jwtService.generateToken(Map.of("tokenType", "refresh"), userDetails);
@@ -268,17 +288,125 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/api/get-user-info")
+    @GetMapping("/get-user-info/")
     public ResponseEntity<?> getUserInfo(HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();
         return ResponseEntity.ok(createUserInfo(user));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception e) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("An error occurred: " + e.getMessage());
+    @PostMapping("/confirm-email/")
+    public ResponseEntity<?> confirmEmail(@RequestBody PreRegisterRequest request) {
+        try {
+
+            Optional<UserModel> existingUser = userRepository.findByEmail(request.getEmail());
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Confirmation email sent successfully");
+            if (existingUser.isPresent()) {
+                UserModel user = existingUser.get();
+                user.setFirst_name(request.getPrenom());
+                user.setLast_name(request.getNom());
+                userRepository.save(user);
+
+                Optional<TokenConfirmation> existingToken = tokenConfirmationRepository.findByUser(user);
+                TokenConfirmation tokenConfirmation;
+
+                if (existingToken.isPresent()) {
+                    tokenConfirmation = existingToken.get();
+                    tokenConfirmation.setToken(UUID.randomUUID().toString());
+                    tokenConfirmation.setExpiryDate(
+                            Date.from(LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()));
+                } else {
+                    tokenConfirmation = new TokenConfirmation();
+                    tokenConfirmation.setToken(UUID.randomUUID().toString());
+                    tokenConfirmation.setUser(user);
+                    tokenConfirmation.setExpiryDate(
+                            Date.from(LocalDateTime.now().plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant()));
+                }
+                tokenConfirmationRepository.save(tokenConfirmation);
+
+                String confirmationUrl = request.getOrigin() + "?token=" + tokenConfirmation.getToken();
+                sendConfirmationEmail(request.getEmail(), confirmationUrl);
+
+                return ResponseEntity.ok(response);
+            } else {
+                UserModel user = new UserModel();
+                user.setEmail(request.getEmail());
+                user.setUsername(request.getEmail());
+                user.setFirst_name(request.getPrenom());
+                user.setLast_name(request.getNom());
+                user.setIs_active(false);
+                user.setDate_joined(new Date());
+                user = userRepository.save(user);
+
+                String token = UUID.randomUUID().toString();
+                Date expiryDate = new Date(System.currentTimeMillis() + 30 * 60 * 1000);
+
+                TokenConfirmation confirmation = new TokenConfirmation();
+                confirmation.setToken(token);
+                confirmation.setUser(user);
+                confirmation.setExpiryDate(expiryDate);
+                confirmation.setConfirmed(false);
+                tokenConfirmationRepository.save(confirmation);
+
+                String confirmationUrl = request.getOrigin() + "?token=" + token;
+                sendConfirmationEmail(user.getEmail(), confirmationUrl);
+
+                return ResponseEntity.ok()
+                        .body(response);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body("Failed to process request: " + e.getMessage());
+        }
     }
+
+    private void sendConfirmationEmail(String email, String confirmationUrl) {
+        String emailContent = """
+                    <html>
+                    <body>
+                        <h2>Email Confirmation</h2>
+                        <p>Please click the button below to confirm your email address:</p>
+                        <a href="%s"
+                           style="background-color: #4CAF50;
+                                  color: white;
+                                  padding: 14px 20px;
+                                  text-decoration: none;
+                                  border-radius: 4px;">
+                            Confirm Email
+                        </a>
+                        <p>This link will expire in 30 minutes.</p>
+                    </body>
+                    </html>
+                """.formatted(confirmationUrl);
+
+        emailService.sendHtmlEmail(email, "Confirm your email", emailContent);
+    }
+
+    @PostMapping("/verify-token/")
+    public ResponseEntity<?> verifyToken(@RequestBody Map<String, String> body) {
+        Map<String, Object> response = new HashMap<>();
+
+        String token = body.get("token");
+        if (token == null) {
+            response.put("message", "Token is required");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Optional<TokenConfirmation> confirmationOpt = tokenConfirmationRepository.findValidToken(token);
+        if (confirmationOpt.isEmpty()) {
+            response.put("message", "Invalid or expired token");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        UserModel user = confirmationOpt.get().getUser();
+        response.put("nom", user.getLast_name());
+        response.put("prenom", user.getFirst_name());
+        response.put("email", user.getEmail());
+        response.put("message", "Token verified successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
 }
