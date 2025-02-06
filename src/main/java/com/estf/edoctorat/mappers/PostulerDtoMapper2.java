@@ -35,7 +35,7 @@ public class PostulerDtoMapper2 {
                 candidat.getVilleDeNaissance(),
                 candidat.getVilleDeNaissanceAr(),
                 candidat.getVille(),
-                candidat.getDateDeNaissance().toString(),
+                candidat.getDateDeNaissance(),
                 candidat.getTypeDeHandicape(),
                 candidat.getAcademie(),
                 candidat.getTelCandidat(),
@@ -43,7 +43,7 @@ public class PostulerDtoMapper2 {
                 candidat.getPathPhoto(),
                 candidat.getEtatDossier(),
                 candidat.getSituation_familiale(),
-                candidat.getFonctionaire() ? "Oui" : "Non"
+                candidat.isFonctionnaire()
         );
     }
 

@@ -175,7 +175,7 @@ public class OperationsService {
                 model.getVilleDeNaissance(),
                 model.getVilleDeNaissanceAr(),
                 model.getVille(),
-                model.getDateDeNaissance().toString(),
+                model.getDateDeNaissance(),
                 model.getTypeDeHandicape(),
                 model.getAcademie(),
                 model.getTelCandidat(),
@@ -183,7 +183,7 @@ public class OperationsService {
                 model.getPathPhoto(),
                 model.getEtatDossier(),
                 model.getSituation_familiale(),
-                model.getFonctionaire() ? "Oui" : "Non"
+                model.isFonctionnaire()
         );
     }
 

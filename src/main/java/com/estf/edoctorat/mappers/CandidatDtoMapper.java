@@ -32,7 +32,7 @@ public class CandidatDtoMapper {
                 candidat.getVilleDeNaissance(),
                 candidat.getVilleDeNaissanceAr(),
                 candidat.getVille(),
-                candidat.getDateDeNaissance().toString(),
+                candidat.getDateDeNaissance(),
                 candidat.getTypeDeHandicape(),
                 candidat.getAcademie(),
                 candidat.getTelCandidat(),
@@ -40,7 +40,7 @@ public class CandidatDtoMapper {
                 candidat.getPathPhoto(),
                 candidat.getEtatDossier(),
                 candidat.getSituation_familiale(),
-                candidat.getFonctionaire().toString()
+                candidat.isFonctionnaire()
         );
 
     }
@@ -66,7 +66,7 @@ public class CandidatDtoMapper {
         if (dto.getDateDeNaissance() != null) {
             try {
                 DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-                LocalDateTime localDateTime = LocalDateTime.parse(dto.getDateDeNaissance(), formatter);
+                LocalDateTime localDateTime = LocalDateTime.parse(dto.getDateDeNaissance().toString(), formatter);
 
                 // Convert LocalDateTime to Instant, then to Date
                 Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
@@ -85,7 +85,7 @@ public class CandidatDtoMapper {
         candidat.setPathPhoto(dto.getPathPhoto());
         candidat.setEtatDossier(dto.getEtatDossier());
         candidat.setSituation_familiale(dto.getSituation_familiale());
-        candidat.setFonctionaire("Oui".equalsIgnoreCase(dto.getFonctionnaire()));
+        candidat.setFonctionnaire("Oui".equalsIgnoreCase(dto.getFonctionnaire()?"Oui" : "Non"));
 
         // Note: You'll need to set up the User and Pays relationships separately
         // as they require fetching from their respective repositories
