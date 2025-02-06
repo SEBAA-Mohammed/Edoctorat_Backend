@@ -23,4 +23,6 @@ public class RegisterRequest {
     private String typeDeHandiCape;
     private String situationfamiliale;
     private String pays;
+    private Boolean fonctionnaire = false;
+
 }

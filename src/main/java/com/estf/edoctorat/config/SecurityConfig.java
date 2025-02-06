@@ -38,9 +38,8 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
                                                                 "/api/token/",
-                                                                "/api/token/",
-                                                                "/api/register/candidat/",
                                                                 "/api/token/refresh/",
+                                                                "/api/register/candidat/",
                                                                 "/api/confirm-email/",
                                                                 "/api/verify-token/")
                                                 .permitAll()
@@ -55,7 +54,8 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+                configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+                configuration.setAllowCredentials(true);
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 configuration.setAllowedHeaders(Arrays.asList(
                                 "Authorization",
@@ -65,8 +65,10 @@ public class SecurityConfig {
                                 "Origin",
                                 "Access-Control-Request-Method",
                                 "Access-Control-Request-Headers"));
-                configuration.setAllowCredentials(true);
-                configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                configuration.setExposedHeaders(Arrays.asList(
+                                "Set-Cookie",
+                                "Authorization"));
+                configuration.setMaxAge(3600L);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/**", configuration);

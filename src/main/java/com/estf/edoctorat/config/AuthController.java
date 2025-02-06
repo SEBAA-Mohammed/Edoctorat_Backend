@@ -99,11 +99,11 @@ public class AuthController {
             // Set JWT cookie
             Cookie jwtCookie = new Cookie("jwt", token);
             jwtCookie.setHttpOnly(true);
+            jwtCookie.setSecure(false);
             jwtCookie.setPath("/");
             jwtCookie.setMaxAge(24 * 60 * 60); // 24 hours
+            jwtCookie.setAttribute("SameSite", "Lax");
             response.addCookie(jwtCookie);
-
-            // Add Authorization header
             response.setHeader("Authorization", "Bearer " + token);
 
             return ResponseEntity.ok()
@@ -213,6 +213,7 @@ public class AuthController {
     @PostMapping("/register/candidat/")
     public ResponseEntity<?> registerCandidat(@RequestBody RegisterRequest request) {
         try {
+            System.out.println(request);
             // Find or create user
             UserModel user = userRepository.findByEmail(request.getEmail())
                     .map(existingUser -> {
@@ -247,7 +248,6 @@ public class AuthController {
                         return paysRepository.save(newPays);
                     });
 
-            // Create candidat
             CandidatModel candidat = new CandidatModel();
             candidat.setUser(user);
             candidat.setCne(request.getCne());
@@ -263,6 +263,8 @@ public class AuthController {
             candidat.setTypeDeHandicape(request.getTypeDeHandiCape());
             candidat.setSituation_familiale(request.getSituationfamiliale());
             candidat.setPays(pays);
+            candidat.setFonctionnaire(request.getFonctionnaire() != null ? request.getFonctionnaire() : false);
+            candidat.setEtatDossier(0);
 
             candidat = candidatRepository.save(candidat);
 
@@ -280,11 +282,9 @@ public class AuthController {
 
     @GetMapping("/protected")
     public ResponseEntity<?> protectedRoute(HttpServletRequest request) {
-        // Get authenticated user from request attribute
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();
 
-        // Use user object
         return ResponseEntity.ok(user);
     }
 

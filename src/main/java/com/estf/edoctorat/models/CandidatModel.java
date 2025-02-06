@@ -2,6 +2,7 @@ package com.estf.edoctorat.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.util.Date;
 import java.util.List;
@@ -36,7 +37,9 @@ public class CandidatModel {
     @ManyToOne
     @JoinColumn(name = "pays_id")
     private PaysModel pays;
-    private boolean fonctionaire;
+    @Column(name = "fonctionnaire", nullable = false)
+    private boolean fonctionnaire = false;
+    @JsonManagedReference
     @OneToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
@@ -47,6 +50,9 @@ public class CandidatModel {
     @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CandidatPostulerModel> candidatPostulers;
 
+    @PrePersist
+    protected void onCreate() {
+        this.fonctionnaire = false;
+        this.etatDossier = 0;
+    }
 }
-
-
