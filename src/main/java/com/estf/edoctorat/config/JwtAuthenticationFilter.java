@@ -30,21 +30,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            jakarta.servlet.FilterChain filterChain
-    ) throws ServletException, IOException {
+            jakarta.servlet.FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
 
         // Skip auth for permitted paths
-        if (request.getServletPath().contains("/api/login") || 
-            request.getServletPath().contains("/api/register") ||
-            request.getServletPath().contains("/api/token/refresh") ||
-            request.getServletPath().contains("/api/verify-is-prof")) {
+        if (request.getServletPath().contains("/api/token") ||
+                request.getServletPath().contains("/api/register") ||
+                request.getServletPath().contains("/api/token/refresh") ||
+                request.getServletPath().contains("/api/verify-is-prof")) {
             filterChain.doFilter(request, response);
             return;
         }
-
         // Check for token in header and cookie
         Cookie[] cookies = request.getCookies();
         String tokenFromCookie = null;
@@ -57,9 +55,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        jwt = tokenFromCookie != null ? tokenFromCookie : 
-              (authHeader != null && authHeader.startsWith("Bearer ")) ? 
-              authHeader.substring(7) : null;
+        jwt = tokenFromCookie != null ? tokenFromCookie
+                : (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : null;
 
         if (jwt == null) {
             filterChain.doFilter(request, response);
@@ -70,13 +67,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userEmail = jwtService.extractUsername(jwt);
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-                
+
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                    );
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     // Add user to request attributes

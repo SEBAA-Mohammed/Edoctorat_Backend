@@ -1,30 +1,22 @@
 package com.estf.edoctorat.controllers;
 
-import com.estf.edoctorat.config.CustomUserDetails;
-import com.estf.edoctorat.dto.SujetDto;
-import com.estf.edoctorat.mappers.SujetDtoMapper;
+import com.estf.edoctorat.dto.CandidatDto;
 import com.estf.edoctorat.models.CandidatModel;
-import com.estf.edoctorat.models.CommissionModel;
-import com.estf.edoctorat.models.SujetModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.repositories.UserRepository;
 import com.estf.edoctorat.services.CandidatService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/")
 public class CandidatController {
 
     @Autowired
@@ -32,7 +24,7 @@ public class CandidatController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping
+    @GetMapping()
     public List<CandidatModel> index() {
         return candidatService.getCandidats();
     }
@@ -45,6 +37,20 @@ public class CandidatController {
     @GetMapping("/search/{name}")
     public List<CandidatModel> getByName(@PathVariable String name) {
         return candidatService.getCandidatByName(name);
+    }
+
+    @GetMapping("/candidat-info/")
+    public ResponseEntity<CandidatDto> getCandidatInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        UserModel user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        CandidatDto candidat = candidatService.getCandidatInfo(user);
+        return ResponseEntity.ok(candidat);
+    }
+
+    @GetMapping("/get-candidat-profile/{id}/")
+    public ResponseEntity<CandidatModel> getCandidatProfile(@PathVariable Long id) {
+        CandidatModel candidat = candidatService.getCandidatProfile(id);
+        return ResponseEntity.ok(candidat);
     }
 
     @PostMapping
@@ -64,8 +70,6 @@ public class CandidatController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCandidat);
     }
 
-
-
     @PutMapping("/{id}")
     public CandidatModel update(@PathVariable Long id, @RequestBody CandidatModel candidat) {
         return candidatService.updateCandidat(id, candidat);
@@ -75,19 +79,6 @@ public class CandidatController {
     public String deleteCandidat(@PathVariable Long id) {
         candidatService.deleteCandidat(id);
         return "Candidat with ID " + id + " has been deleted!";
-    }
-
-    @GetMapping("/get-ced-candidats/")
-    public ResponseEntity<Map<String, Object>> getCandidatCed(HttpServletRequest request,  @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
-        UserDetails userDetails = (UserDetails) request.getAttribute("user");
-        UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
-        Page<CandidatModel> listCandidats =  candidatService.getCandidatByCed(currentUser, limit, offset);
-        Map<String, Object> response = new HashMap<>();
-        response.put("count", listCandidats.getTotalElements());
-        response.put("next", listCandidats.hasNext() ? offset + limit : null);
-        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
-        response.put("results", listCandidats);
-        return ResponseEntity.ok(response);
     }
 
 }

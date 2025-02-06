@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.util.Date;
 
@@ -35,6 +36,7 @@ public class UserModel {
     @JoinColumn(name = "user_group_id")
     private UserGroupModel userGroup;
     
+    @JsonBackReference 
     @OneToOne(mappedBy = "user")
     private CandidatModel candidat;
     

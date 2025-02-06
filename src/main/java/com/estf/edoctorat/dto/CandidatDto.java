@@ -1,15 +1,11 @@
 package com.estf.edoctorat.dto;
 
-import lombok.AllArgsConstructor;
+import java.util.Date;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-
 public class CandidatDto {
-
     private Long id;
     private String cne;
     private String pays;
@@ -25,14 +21,13 @@ public class CandidatDto {
     private String villeDeNaissance;
     private String villeDeNaissanceAr;
     private String ville;
-    private String dateDeNaissance;
+    private Date dateDeNaissance;
     private String typeDeHandicape;
     private String academie;
     private String telCandidat;
     private String pathCv;
     private String pathPhoto;
-    private int etatDossier;
+    private Integer etatDossier;
     private String situation_familiale;
-    private String fonctionnaire;
-
+    private Boolean fonctionnaire;
 }
