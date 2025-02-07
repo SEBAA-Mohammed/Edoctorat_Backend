@@ -23,12 +23,8 @@ public class OperationsController {
         return ResponseEntity.ok(operationsService.getAllFormationDoctorales());
     }
 
-//    @GetMapping("/get-professeurs")
-//    public ResponseEntity<List<ProfesseurDto>> getProfesseurs() {
-//        return ResponseEntity.ok(operationsService.getAllProfesseurs());
-//    }
 
-    @GetMapping("/sujets")
+    @GetMapping("/sujets/")
     public ResponseEntity<List<Sujet2Dto>> getSujets() {
         return ResponseEntity.ok(operationsService.getAllSujets());
     }

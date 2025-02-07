@@ -22,9 +22,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class ProfesseurController {
 
-    private ProfesseurService professeurService;
+    private final ProfesseurService professeurService;
 
-    @GetMapping("/get-professeurs")
+    public ProfesseurController(ProfesseurService professeurService) {
+        this.professeurService = professeurService;
+    }
+
+    @GetMapping("/get-professeurs/")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getAllProfesseur(@RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset){
 
@@ -38,7 +42,7 @@ public class ProfesseurController {
         response.put("count", listProf.getTotalElements());
         response.put("next", listProf.hasNext() ? offset + limit : null);
         response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
-        response.put("results", listProf);
+        response.put("results", listProf.getContent());
         return ResponseEntity.ok(response);
 
     }
