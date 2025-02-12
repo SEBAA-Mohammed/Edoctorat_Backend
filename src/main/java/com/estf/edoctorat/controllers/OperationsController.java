@@ -86,4 +86,8 @@ public class OperationsController {
 
         return ResponseEntity.ok(response);
     }
+    //    @GetMapping("/get-professeurs")
+//    public ResponseEntity<List<ProfesseurDto>> getProfesseurs() {
+//        return ResponseEntity.ok(operationsService.getAllProfesseurs());
+//    }
 }

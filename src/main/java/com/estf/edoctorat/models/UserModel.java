@@ -34,13 +34,15 @@ public class UserModel {
     private Date date_joined;
     @ManyToOne
     @JoinColumn(name = "user_group_id")
+    @JsonBackReference
     private UserGroupModel userGroup;
     
     @JsonBackReference 
     @OneToOne(mappedBy = "user")
     private CandidatModel candidat;
     
-    @OneToOne(mappedBy = "user") 
+    @OneToOne(mappedBy = "user")
+    @JsonBackReference
     private ProfesseurModel professeur;
 
 }
