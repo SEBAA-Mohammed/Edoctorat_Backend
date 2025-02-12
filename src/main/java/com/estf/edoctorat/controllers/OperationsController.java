@@ -34,7 +34,7 @@ public class OperationsController {
         return ResponseEntity.ok(operationsService.getSujetById(id));
     }
 
-    @PostMapping("/sujets")
+    @PostMapping("/sujets/")
     public ResponseEntity<Sujet2Dto> createSujet(@RequestBody Sujet2Dto sujet) {
         return ResponseEntity.ok(operationsService.createSujet(sujet));
     }
