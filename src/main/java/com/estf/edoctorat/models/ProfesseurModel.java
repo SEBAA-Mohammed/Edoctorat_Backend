@@ -40,5 +40,6 @@ public class ProfesseurModel {
     @OneToMany(mappedBy = "professeur", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommissionProfesseurModel> commissionProfesseurs;
     @OneToOne(mappedBy = "professeur", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private CedModel ced;
 }

@@ -36,7 +36,7 @@ public class FormationdoctoraleController {
         response.put("count", listFormationD.getTotalElements());
         response.put("next", listFormationD.hasNext() ? offset + limit : null);
         response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
-        response.put("results", listFormationD);
+        response.put("results", listFormationD.getContent());
         return ResponseEntity.ok(response);
 
     }

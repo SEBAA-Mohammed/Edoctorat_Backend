@@ -3,6 +3,7 @@ package com.estf.edoctorat.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,5 +18,6 @@ public class EtablissementModel {
     private String nomEtablissement ;
     @OneToMany
     @JoinColumn(name = "etablissement_id")
+    @JsonBackReference
     private List<FormationdoctoraleModel> formationdoctorales;
 }

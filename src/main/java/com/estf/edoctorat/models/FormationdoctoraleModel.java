@@ -1,5 +1,7 @@
 package com.estf.edoctorat.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -24,11 +26,13 @@ public class FormationdoctoraleModel {
     private Date dateAccreditation;
     @ManyToOne
     @JoinColumn(name = "ced_id")
+    @JsonBackReference
     private CedModel ced;
     // @Column(length = 10, nullable = false)
     // private String etablissement_id;
     @ManyToOne
     @JoinColumn(name = "etablissement_id")
+    @JsonManagedReference
     private EtablissementModel etablissement;
     @OneToMany(mappedBy = "formationDoctorale", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SujetModel> sujets;
