@@ -65,9 +65,9 @@ public class OperationsService {
                 .collect(Collectors.toList());
     }
 
-    public List<Sujet2Dto> getAllSujets() {
+    public List<SujetDto> getAllSujets() {
         return sujetRepo.findAll().stream()
-                .map(this::mapToSujetDto)
+                .map(this::mapToSujetDtoNew)
                 .collect(Collectors.toList());
     }
 
@@ -135,6 +135,17 @@ public class OperationsService {
     }
 
     // Mapping methods
+    private SujetDto mapToSujetDtoNew(SujetModel model) {
+        return new SujetDto(
+                model.getId(),
+                mapToProfesseurDto(model.getProfesseur()),
+                mapToFormationDoctoraleDto(model.getFormationDoctorale()),
+                model.getTitre(),
+                model.getCodirecteur() != null ? mapToProfesseurDto(model.getCodirecteur()) : null,
+                model.getDescription(),
+                model.getPublier()
+        );
+    }
     private FormationdoctoraleDto mapToFormationDoctoraleDto(FormationdoctoraleModel model) {
         return new FormationdoctoraleDto(
                 model.getId(),

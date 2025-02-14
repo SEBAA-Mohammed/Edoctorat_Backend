@@ -28,10 +28,16 @@ public class OperationsController {
 
 
     @GetMapping("/sujets/")
-    public ResponseEntity<List<Sujet2Dto>> getSujets() {
-        return ResponseEntity.ok(operationsService.getAllSujets());
-    }
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getSujets() {
+        List<SujetDto> sujets = operationsService.getAllSujets();
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", sujets.size());
+        response.put("results", sujets);
+
+        return ResponseEntity.ok(response);
+    }
     @GetMapping("/sujets/{id}")
     public ResponseEntity<Sujet2Dto> getSujet(@PathVariable Long id) {
         return ResponseEntity.ok(operationsService.getSujetById(id));

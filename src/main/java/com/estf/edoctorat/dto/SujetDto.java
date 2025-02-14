@@ -14,7 +14,7 @@ public class SujetDto {
     private ProfesseurDto professeur;
     private FormationdoctoraleDto formationDoctorale;
     private String titre;
-    private ProfesseurDto codirecteur;
+    private ProfesseurDto coDirecteur;
     private String description;
     private Boolean publier;
 
