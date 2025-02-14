@@ -1,5 +1,6 @@
 package com.estf.edoctorat.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class CedModel {
     private String titre;
     @OneToOne
     @JoinColumn(name = "directeur_id")
-    @JsonManagedReference
+    @JsonBackReference
     private ProfesseurModel professeur;
     @OneToMany(mappedBy = "ced", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

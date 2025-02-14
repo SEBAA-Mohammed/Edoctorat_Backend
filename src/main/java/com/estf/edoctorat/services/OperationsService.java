@@ -1,13 +1,18 @@
 package com.estf.edoctorat.services;
 
+import com.estf.edoctorat.config.CustomUserDetails;
 import com.estf.edoctorat.dto.*;
 import com.estf.edoctorat.mappers.CommissionDtoMapper;
 import com.estf.edoctorat.mappers.InscriptionMapper;
 import com.estf.edoctorat.models.*;
 import com.estf.edoctorat.repositories.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,8 +77,42 @@ public class OperationsService {
                 .orElseThrow(() -> new RuntimeException("Sujet not found"));
     }
 
-    public Sujet2Dto createSujet(Sujet2Dto sujetDto) {
-        SujetModel sujet = mapToSujetModel(sujetDto);
+    public Sujet2Dto createSujet(CreateSujetDto createSujetDto) {
+        // Get the authenticated user using Spring Security's SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserModel user = userDetails.getUser();
+
+        // Get the professor from the user
+//        ProfesseurModel professeur = user.getProfesseur();
+//        if (professeur == null) {
+//            throw new RuntimeException("Only professors can create subjects");
+//        }
+
+        SujetModel sujet = new SujetModel();
+        sujet.setTitre(createSujetDto.getTitre());
+        sujet.setDescription(createSujetDto.getDescription());
+
+        // Set the authenticated professor as the main professor
+//        sujet.setProfesseur(professeur);
+
+        // Get and set FormationDoctorale
+        FormationdoctoraleModel formationDoctorale = formationDoctoraleRepo
+                .findById(createSujetDto.getFormationDoctoraleId())
+                .orElseThrow(() -> new RuntimeException("Formation doctorale not found"));
+        sujet.setFormationDoctorale(formationDoctorale);
+
+        // Get and set CoDirecteur if provided
+        if (createSujetDto.getCoDirecteurId() != null) {
+            ProfesseurModel coDirecteur = professeurRepo
+                    .findById(createSujetDto.getCoDirecteurId())
+                    .orElseThrow(() -> new RuntimeException("Co-directeur not found"));
+            sujet.setCodirecteur(coDirecteur);
+        }
+
+        sujet.setPublier(false); // Set default value
+
+        // Save and return
         SujetModel savedSujet = sujetRepo.save(sujet);
         return mapToSujetDto(savedSujet);
     }

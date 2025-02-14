@@ -2,6 +2,7 @@ package com.estf.edoctorat.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class SujetModel {
     private ProfesseurModel codirecteur;
     @ManyToOne
     @JoinColumn(name = "formationDoctorale_id")
+    @JsonBackReference
     private FormationdoctoraleModel formationDoctorale;
     @OneToOne
     @JoinColumn(name = "professeur_id")

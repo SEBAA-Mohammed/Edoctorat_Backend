@@ -2,8 +2,10 @@ package com.estf.edoctorat.controllers;
 
 import com.estf.edoctorat.dto.*;
 import com.estf.edoctorat.services.OperationsService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class OperationsController {
 
     private final OperationsService operationsService;
@@ -34,8 +37,9 @@ public class OperationsController {
         return ResponseEntity.ok(operationsService.getSujetById(id));
     }
 
+
     @PostMapping("/sujets/")
-    public ResponseEntity<Sujet2Dto> createSujet(@RequestBody Sujet2Dto sujet) {
+    public ResponseEntity<Sujet2Dto> createSujet(@RequestBody CreateSujetDto sujet) {
         return ResponseEntity.ok(operationsService.createSujet(sujet));
     }
 

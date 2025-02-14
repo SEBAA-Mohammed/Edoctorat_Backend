@@ -41,7 +41,8 @@ public class SecurityConfig {
                                                                 "/api/token/refresh/",
                                                                 "/api/register/candidat/",
                                                                 "/api/confirm-email/",
-                                                                "/api/verify-token/")
+                                                                "/api/verify-token/",
+                                                        "/api/sujets/**"  )
                                                 .permitAll()
                                                 .anyRequest().authenticated())
                                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

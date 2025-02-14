@@ -35,5 +35,6 @@ public class FormationdoctoraleModel {
     @JsonManagedReference
     private EtablissementModel etablissement;
     @OneToMany(mappedBy = "formationDoctorale", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<SujetModel> sujets;
 }
