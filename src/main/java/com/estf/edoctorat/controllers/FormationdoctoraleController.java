@@ -35,6 +35,29 @@ public class FormationdoctoraleController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved doctoral training programs", content = @Content(schema = @Schema(implementation = Map.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    // @GetMapping
+    // @ResponseBody
+    // public ResponseEntity<Map<String, Object>> getAllFormationdoctorale(
+    // @Parameter(description = "Number of items per page")
+    // @RequestParam(defaultValue = "50") int limit,
+    // @Parameter(description = "Page offset") @RequestParam(defaultValue = "0") int
+    // offset) {
+
+    // Page<FormationdoctoraleModel> listFormationD =
+    // formationdoctoraleService.getAll(limit, offset);
+
+    // listFormationD.stream()
+    // .map(FormationdoctoraleDtoMapper::toDto)
+    // .toList();
+
+    // Map<String, Object> response = new HashMap<>();
+    // response.put("count", listFormationD.getTotalElements());
+    // response.put("next", listFormationD.hasNext() ? offset + limit : null);
+    // response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+    // response.put("results", listFormationD.getContent());
+    // return ResponseEntity.ok(response);
+
+    // }
     @GetMapping
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getAllFormationdoctorale(
@@ -43,17 +66,16 @@ public class FormationdoctoraleController {
 
         Page<FormationdoctoraleModel> listFormationD = formationdoctoraleService.getAll(limit, offset);
 
-        listFormationD.stream()
+        List<FormationdoctoraleDto> dtoList = listFormationD.getContent().stream()
                 .map(FormationdoctoraleDtoMapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
 
         Map<String, Object> response = new HashMap<>();
         response.put("count", listFormationD.getTotalElements());
         response.put("next", listFormationD.hasNext() ? offset + limit : null);
         response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
-        response.put("results", listFormationD.getContent());
+        response.put("results", dtoList);
         return ResponseEntity.ok(response);
-
     }
 
 }

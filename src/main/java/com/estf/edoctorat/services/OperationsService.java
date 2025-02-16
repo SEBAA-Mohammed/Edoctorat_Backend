@@ -86,9 +86,9 @@ public class OperationsService {
 
     public Sujet2Dto createSujet(CreateSujetDto createSujetDto) {
         // Get the authenticated user using Spring Security's SecurityContextHolder
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        UserModel user = userDetails.getUser();
+        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        // UserModel user = userDetails.getUser();
 
         // Get the professor from the user
         // ProfesseurModel professeur = user.getProfesseur();
