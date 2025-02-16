@@ -1,5 +1,6 @@
 package com.estf.edoctorat.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +31,7 @@ public class CommissionModel {
     @JoinColumn(name = "labo_id")
     private LaboratoireModel laboratoire;
     @OneToMany(mappedBy = "commission", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<CommissionProfesseurModel> commissionProfesseurs;
     @OneToMany(mappedBy = "commission", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CandidatNotificationModel> notifications;

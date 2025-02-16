@@ -62,9 +62,23 @@ public class OperationsService {
     }
 
     public Page<ExaminerDto> getResultats(int page, int size) {
+        // Get the authenticated user using Spring Security's SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserModel user = userDetails.getUser();
+
+        // Get the professor from the user
+        ProfesseurModel professeur = user.getProfesseur();
+        if (professeur == null) {
+            throw new RuntimeException("Only professors can access examination results");
+        }
+
+        // Fetch all examiners for the logged-in professor with pagination
         PageRequest pageRequest = PageRequest.of(page, size);
-        return examinerRepo.findAll(pageRequest)
-                .map(this::mapToExaminerDto);
+        Page<ExaminerModel> examiners = examinerRepo.findExaminersByProfesseurId(professeur.getId(), pageRequest);
+
+        // Map the examiners to ExaminerDto
+        return examiners.map(this::mapToExaminerDto);
     }
 
     public List<FormationdoctoraleDto> getAllFormationDoctorales() {

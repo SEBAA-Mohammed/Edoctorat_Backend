@@ -38,6 +38,7 @@ public class ProfesseurModel {
     @JsonManagedReference
     private UserModel user;
     @OneToMany(mappedBy = "professeur", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<CommissionProfesseurModel> commissionProfesseurs;
     @OneToOne(mappedBy = "professeur", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
