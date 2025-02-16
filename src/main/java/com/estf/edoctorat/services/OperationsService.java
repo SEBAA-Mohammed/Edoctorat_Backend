@@ -56,9 +56,23 @@ public class OperationsService {
     }
 
     public Page<InscriptionDto> getMesInscrits(int page, int size) {
+        // Get the authenticated user using Spring Security's SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserModel user = userDetails.getUser();
+
+        // Get the professor from the user
+        ProfesseurModel professeur = user.getProfesseur();
+        if (professeur == null) {
+            throw new RuntimeException("Only professors can access their inscriptions");
+        }
+
+        // Fetch all inscriptions for the logged-in professor
         PageRequest pageRequest = PageRequest.of(page, size);
-        return inscriptionRepo.findAll(pageRequest)
-                .map(this::mapToInscriptionDto);
+        Page<InscriptionModel> inscriptions = inscriptionRepo.findBySujetProfesseurId(professeur.getId(), pageRequest);
+
+        // Map the inscriptions to InscriptionDto
+        return inscriptions.map(this::mapToInscriptionDto);
     }
 
     public Page<ExaminerDto> getResultats(int page, int size) {
