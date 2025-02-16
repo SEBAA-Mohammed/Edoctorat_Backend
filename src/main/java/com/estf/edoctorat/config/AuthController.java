@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -77,6 +78,9 @@ public class AuthController {
     @Autowired
     private UserGroupRepository userGroupRepository;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     private GoogleIdToken.Payload verifyGoogleToken(String idTokenString) throws GeneralSecurityException, IOException {
         return googleTokenVerifier.verify(idTokenString);
     }
@@ -138,6 +142,11 @@ public class AuthController {
             return createProfessorInfo(profOpt.get());
         }
 
+        Optional<CandidatModel> candidatOpt = candidatRepository.findByUser(user);
+        if (candidatOpt.isPresent()) {
+            return createCandidatInfo(candidatOpt.get());
+        }
+
         return new AuthResponse.UserInfo(
                 user.getEmail(),
                 user.getLast_name(),
@@ -164,7 +173,7 @@ public class AuthController {
                 user.getEmail(),
                 user.getLast_name(),
                 user.getFirst_name(),
-                professor.getPathPhoto(),
+                getFullPhotoUrl(professor.getPathPhoto()),
                 groups,
                 misc);
     }
@@ -185,9 +194,16 @@ public class AuthController {
                 user.getEmail(),
                 user.getLast_name(),
                 user.getFirst_name(),
-                candidat.getPathPhoto(),
+                getFullPhotoUrl(candidat.getPathPhoto()),
                 groups,
                 misc);
+    }
+
+    private String getFullPhotoUrl(String pathPhoto) {
+        if (pathPhoto == null || pathPhoto.isEmpty()) {
+            return null;
+        }
+        return baseUrl + "/" + pathPhoto;
     }
 
     @PostMapping("/verify-is-prof/")

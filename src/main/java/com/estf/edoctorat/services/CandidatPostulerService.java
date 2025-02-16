@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,12 @@ public class CandidatPostulerService {
         }
     }
 
-    public Page<CandidatPostulerModel> getAll(int limit, int offset){ return candidatPostulerRepository.findAll(PageRequest.of(offset/limit, limit)); }
+    public Page<CandidatPostulerModel> getByCandidatId(Long candidatId, Pageable pageable) {
+        return candidatPostulerRepository.findByCandidatId(candidatId, pageable);
+    }
+
+    public Page<CandidatPostulerModel> getAll(int limit, int offset) {
+        return candidatPostulerRepository.findAll(PageRequest.of(offset / limit, limit));
+    }
 
 }

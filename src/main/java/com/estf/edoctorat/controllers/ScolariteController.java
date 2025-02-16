@@ -17,7 +17,7 @@ public class ScolariteController {
 
     private final ScolariteService scolariteService;
 
-    @GetMapping("/scolarite")
+    @GetMapping("/scolarite/")
     public ResponseEntity<Map<String, Object>> getScolariteCandidats(
             @RequestParam(defaultValue = "50") int limit,
             @RequestParam(defaultValue = "0") int offset) {
@@ -33,7 +33,7 @@ public class ScolariteController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/scolarite/{id}")
+    @PatchMapping("/scolarite/{id}/")
     public ResponseEntity<PostulerDto> updateScolarite(
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {

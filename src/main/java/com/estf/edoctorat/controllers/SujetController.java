@@ -33,7 +33,7 @@ public class SujetController {
     private ProfesseurService professeurService;
 
 
-    @GetMapping("/sujetslabo")
+    @GetMapping("/sujetslabo/")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getSujetsLabo(HttpServletRequest request, @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
 
@@ -79,19 +79,19 @@ public class SujetController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/sujetslabo")
+    @PostMapping("/sujetslabo/")
     public SujetModel create(@RequestBody SujetModel sujetModel, HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
         return sujetService.create(sujetModel, currentUser);
     }
 
-    @PutMapping("/sujetslabo/{id}")
+    @PutMapping("/sujetslabo/{id}/")
     public SujetModel update(@PathVariable long id, @RequestBody SujetModel sujetModel){
         return sujetService.update(id, sujetModel);
     }
 
-    @DeleteMapping("/sujetslabo/{id}")
+    @DeleteMapping("/sujetslabo/{id}/")
     public ResponseEntity<Void> delete(@PathVariable long id){
         sujetService.delete(id);
         return ResponseEntity.noContent().build();

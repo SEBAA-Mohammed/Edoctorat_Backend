@@ -18,48 +18,48 @@ public class OperationsController {
 
     private final OperationsService operationsService;
 
-    @GetMapping("/formation-doctorale")
-    public ResponseEntity<List<FormationdoctoraleDto>> getFormationDoctorales() {
-        return ResponseEntity.ok(operationsService.getAllFormationDoctorales());
-    }
+    // @GetMapping("/formation-doctorale")
+    // public ResponseEntity<List<FormationdoctoraleDto>> getFormationDoctorales() {
+    // return ResponseEntity.ok(operationsService.getAllFormationDoctorales());
+    // }
 
-//    @GetMapping("/get-professeurs")
-//    public ResponseEntity<List<ProfesseurDto>> getProfesseurs() {
-//        return ResponseEntity.ok(operationsService.getAllProfesseurs());
-//    }
+    // @GetMapping("/get-professeurs")
+    // public ResponseEntity<List<ProfesseurDto>> getProfesseurs() {
+    // return ResponseEntity.ok(operationsService.getAllProfesseurs());
+    // }
 
-    @GetMapping("/sujets")
+    @GetMapping("/sujets/")
     public ResponseEntity<List<Sujet2Dto>> getSujets() {
         return ResponseEntity.ok(operationsService.getAllSujets());
     }
 
-    @GetMapping("/sujets/{id}")
+    @GetMapping("/sujets/{id}/")
     public ResponseEntity<Sujet2Dto> getSujet(@PathVariable Long id) {
         return ResponseEntity.ok(operationsService.getSujetById(id));
     }
 
-    @PostMapping("/sujets")
+    @PostMapping("/sujets/")
     public ResponseEntity<Sujet2Dto> createSujet(@RequestBody Sujet2Dto sujet) {
         return ResponseEntity.ok(operationsService.createSujet(sujet));
     }
 
-    @PutMapping("/sujets/{id}")
+    @PutMapping("/sujets/{id}/")
     public ResponseEntity<Sujet2Dto> updateSujet(@PathVariable Long id, @RequestBody Sujet2Dto sujet) {
         return ResponseEntity.ok(operationsService.updateSujet(id, sujet));
     }
 
-    @DeleteMapping("/sujets/{id}")
+    @DeleteMapping("/sujets/{id}/")
     public ResponseEntity<Void> deleteSujet(@PathVariable Long id) {
         operationsService.deleteSujet(id);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/participant")
+    @GetMapping("/participant/")
     public ResponseEntity<List<CommissionDto>> getCommissions() {
         return ResponseEntity.ok(operationsService.getAllCommissions());
     }
 
-    @GetMapping("/examiner")
+    @GetMapping("/examiners/")
     public ResponseEntity<Map<String, Object>> getResultats(
             @RequestParam(defaultValue = "50") int limit,
             @RequestParam(defaultValue = "0") int offset) {
@@ -75,7 +75,7 @@ public class OperationsController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/inscrits")
+    @GetMapping("/inscrits/")
     public ResponseEntity<Map<String, Object>> getMesInscrits(
             @RequestParam(defaultValue = "50") int limit,
             @RequestParam(defaultValue = "0") int offset) {

@@ -37,7 +37,7 @@ public class CalendrierController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/update-calendrier/{calendrierId}")
+    @PatchMapping("/update-calendrier/{calendrierId}/")
     public ResponseEntity<DirecteurPoleCalendrierModel> updateCalendrier(
             @PathVariable int calendrierId,
             @RequestBody CalendrierDto updateRequest) {

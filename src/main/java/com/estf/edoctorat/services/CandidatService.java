@@ -97,10 +97,8 @@ public class CandidatService {
                 .orElseThrow(() -> new RuntimeException("Candidate not found for user"));
 
         CandidatDto dto = new CandidatDto();
-        // Map basic fields
         BeanUtils.copyProperties(candidat, dto);
 
-        // Map user fields
         dto.setNom(candidat.getUser().getLast_name());
         dto.setPrenom(candidat.getUser().getFirst_name());
         dto.setEmail(candidat.getUser().getEmail());

@@ -24,12 +24,13 @@ public class ProfesseurController {
 
     private ProfesseurService professeurService;
 
-    @GetMapping("/get-professeurs")
+    @GetMapping("/get-professeurs/")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getAllProfesseur(@RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset){
+    public ResponseEntity<Map<String, Object>> getAllProfesseur(@RequestParam(defaultValue = "50") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
 
         Page<ProfesseurModel> listProf = professeurService.getAll(limit, offset);
-
+        System.out.println("listProf: " + listProf);
         listProf.stream()
                 .map(ProfesseurDtoMapper::toDto)
                 .toList();
@@ -43,10 +44,10 @@ public class ProfesseurController {
 
     }
 
-
     @GetMapping("/labo_professeur/")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getAllProfLab(HttpServletRequest request, @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset ){
+    public ResponseEntity<Map<String, Object>> getAllProfLab(HttpServletRequest request,
+            @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
 
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();

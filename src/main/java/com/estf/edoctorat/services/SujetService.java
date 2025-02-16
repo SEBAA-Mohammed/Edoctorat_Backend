@@ -66,5 +66,8 @@ public class SujetService {
             sujetRepository.save(sujet);
         }
     }
+    public Page<SujetModel> getPublishedSubjects(int limit, int offset) {
+        return sujetRepository.findByPublierTrue(PageRequest.of(offset / limit, limit));
+    }
 
 }

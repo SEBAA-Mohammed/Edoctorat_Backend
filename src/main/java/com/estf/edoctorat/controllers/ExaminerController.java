@@ -32,7 +32,7 @@ public class ExaminerController {
     @Autowired
     private ProfesseurService professeurService;
 
-    @GetMapping("examiner/")
+    @GetMapping("/examiner/")
     public List<ExaminerModel> index(){
         return examinerService.getAll();
     }
@@ -75,7 +75,7 @@ public class ExaminerController {
 
     }
 
-    @PutMapping("/labo_valider_examiner/{id}")
+    @PutMapping("/labo_valider_examiner/{id}/")
     @ResponseBody
     public ExaminerModel validerCandidat(@PathVariable long id, @RequestBody ItemValider item){
 

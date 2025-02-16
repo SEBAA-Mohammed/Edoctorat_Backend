@@ -23,7 +23,7 @@ public class PoleSujetController {
     @Autowired
     private PoleSujetService sujetService;
 
-    @GetMapping("/get-all-sujets")
+    @GetMapping("/get-all-sujets/")
     public ResponseEntity<Map<String, Object>> getAllSujets(
             @RequestParam(defaultValue = "50") int limit,
             @RequestParam(defaultValue = "0") int offset) {

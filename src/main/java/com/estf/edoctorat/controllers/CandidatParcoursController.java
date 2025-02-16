@@ -1,0 +1,252 @@
+package com.estf.edoctorat.controllers;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.estf.edoctorat.config.CustomUserDetails;
+import com.estf.edoctorat.dto.DiplomeDto;
+import com.estf.edoctorat.mappers.DiplomeDtoMapper;
+import com.estf.edoctorat.models.AnnexeModel;
+import com.estf.edoctorat.models.DiplomeModel;
+import com.estf.edoctorat.models.UserModel;
+import com.estf.edoctorat.services.DiplomeService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@RestController
+@RequestMapping("/api")
+public class CandidatParcoursController {
+
+    @Autowired
+    private DiplomeService diplomeService;
+
+    @GetMapping("/candidat-parcours/")
+    public ResponseEntity<Map<String, Object>> getDiplomes(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "50") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
+
+        UserDetails userDetails = (UserDetails) request.getAttribute("user");
+        UserModel user = ((CustomUserDetails) userDetails).getUser();
+
+        Page<DiplomeDto> diplomes = diplomeService.getDiplomesByCandidat(
+                user.getCandidat().getId(),
+                limit,
+                offset);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", diplomes.getTotalElements());
+        response.put("next", diplomes.hasNext() ? offset + limit : null);
+        response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
+        response.put("results", diplomes.getContent());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Value("${app.base-url}")
+    private String baseUrl;
+
+    private String getFullPdfUrl(String pathPdf) {
+        if (pathPdf == null || pathPdf.isEmpty()) {
+            return null;
+        }
+        return baseUrl + "/" + pathPdf;
+    }
+
+    @PostMapping("/candidat-parcours/")
+    public ResponseEntity<DiplomeDto> addDiplome(
+            @RequestBody Map<String, Object> request,
+            HttpServletRequest httpRequest) {
+
+        try {
+            UserDetails userDetails = (UserDetails) httpRequest.getAttribute("user");
+            UserModel user = ((CustomUserDetails) userDetails).getUser();
+
+            DiplomeModel diplome = new DiplomeModel();
+            diplome.setAnnexes(new ArrayList<>());
+
+            diplome.setIntitule((String) request.get("intitule"));
+            diplome.setType((String) request.get("type"));
+            diplome.setDateCommission(new SimpleDateFormat("yyyy-MM-dd").parse((String) request.get("dateCommission")));
+            diplome.setPays((String) request.get("pays"));
+            diplome.setVille((String) request.get("ville"));
+            diplome.setProvince((String) request.get("province"));
+            diplome.setMention((String) request.get("mention"));
+            diplome.setEtablissement((String) request.get("etablissement"));
+            diplome.setSpecialite((String) request.get("specialite"));
+            diplome.setMoyen_generale(Double.parseDouble(request.get("moyen_generale").toString()));
+            diplome.setCandidat(user.getCandidat());
+
+            String diplomePath = (String) request.get("diplomePath");
+            if (diplomePath != null) {
+                AnnexeModel annexe = new AnnexeModel();
+                annexe.setTypeAnnexe("diplome");
+                annexe.setTitre(diplomePath.substring(diplomePath.lastIndexOf('/') + 1));
+                annexe.setPathFile(diplomePath);
+                annexe.setDiplome(diplome);
+                diplome.getAnnexes().add(annexe);
+            }
+
+            String relevePath = (String) request.get("relevePath");
+            if (relevePath != null) {
+                AnnexeModel annexe = new AnnexeModel();
+                annexe.setTypeAnnexe("releve");
+                annexe.setTitre(relevePath.substring(relevePath.lastIndexOf('/') + 1));
+                annexe.setPathFile(relevePath);
+                annexe.setDiplome(diplome);
+                diplome.getAnnexes().add(annexe);
+            }
+
+            DiplomeModel saved = diplomeService.create(diplome);
+            DiplomeDto dto = DiplomeDtoMapper.toDto(saved);
+
+            return ResponseEntity.ok(dto);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PatchMapping("/candidat-parcours/{id}/")
+    public ResponseEntity<DiplomeDto> updateDiplome(
+            @PathVariable Long id,
+            @RequestBody DiplomeModel updates) {
+
+        DiplomeModel updated = diplomeService.update(id, updates);
+        return ResponseEntity.ok(DiplomeDtoMapper.toDto(updated));
+    }
+
+    @DeleteMapping("/candidat-parcours/{id}/")
+    public ResponseEntity<Void> deleteDiplome(@PathVariable Long id) {
+        diplomeService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // -----------------------------------------------------------------------
+
+    // @PostMapping("/upload")
+    // public ResponseEntity<Map<String, String>> uploadFile(
+    // @RequestParam("file1") MultipartFile file1,
+    // @RequestParam("file2") MultipartFile file2) throws IOException {
+
+    // Map<String, String> response = new HashMap<>();
+
+    // if (file1.isEmpty() || file2.isEmpty()) {
+    // return ResponseEntity.badRequest()
+    // .body(Collections.singletonMap("error", "Please select both files to
+    // upload"));
+    // }
+
+    // if (!file1.getContentType().equals("application/pdf") ||
+    // !file2.getContentType().equals("application/pdf")) {
+    // return ResponseEntity.badRequest().body(Collections.singletonMap("error",
+    // "Only PDF files are allowed"));
+    // }
+
+    // String uploadDir = "uploads/photos/";
+    // Path uploadPath = Paths.get(uploadDir);
+    // if (!Files.exists(uploadPath)) {
+    // Files.createDirectories(uploadPath);
+    // }
+
+    // try {
+    // String timestamp1 =
+    // LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+    // String filename1 = timestamp1 + "_" + file1.getOriginalFilename();
+    // Path filePath1 = uploadPath.resolve(filename1);
+    // Files.copy(file1.getInputStream(), filePath1,
+    // StandardCopyOption.REPLACE_EXISTING);
+    // response.put("file1", filename1);
+
+    // String timestamp2 =
+    // LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+    // String filename2 = timestamp2 + "_" + file2.getOriginalFilename();
+    // Path filePath2 = uploadPath.resolve(filename2);
+    // Files.copy(file2.getInputStream(), filePath2,
+    // StandardCopyOption.REPLACE_EXISTING);
+    // response.put("file2", filename2);
+
+    // return ResponseEntity.ok(response);
+
+    // } catch (IOException e) {
+    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    // .body(Collections.singletonMap("error", "File upload failed"));
+    // }
+    // }
+
+    @PostMapping(value = "/upload-files/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> uploadFiles(
+            @RequestPart(value = "diplomeFile", required = false) MultipartFile diplomeFile,
+            @RequestPart(value = "releveFile", required = false) MultipartFile releveFile) {
+
+        Map<String, String> response = new HashMap<>();
+        String uploadDir = "uploads/diplomes/";
+        Path uploadPath = Paths.get(uploadDir);
+
+        try {
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            if (diplomeFile != null && !diplomeFile.isEmpty()) {
+                // if (!diplomeFile.getContentType().equals("application/pdf")) {
+                // return ResponseEntity.badRequest()
+                // .body(Collections.singletonMap("error", "Only PDF files are allowed"));
+                // }
+                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                String filename = timestamp + "_" + diplomeFile.getOriginalFilename();
+                Path filePath = uploadPath.resolve(filename);
+                Files.copy(diplomeFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                response.put("diplomePath", uploadDir + filename);
+            }
+
+            if (releveFile != null && !releveFile.isEmpty()) {
+                // if (!releveFile.getContentType().equals("application/pdf")) {
+                // return ResponseEntity.badRequest()
+                // .body(Collections.singletonMap("error", "Only PDF files are allowed"));
+                // }
+                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                String filename = timestamp + "_" + releveFile.getOriginalFilename();
+                Path filePath = uploadPath.resolve(filename);
+                Files.copy(releveFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                response.put("relevePath", uploadDir + filename);
+            }
+
+            return ResponseEntity.ok(response);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "File upload failed"));
+        }
+    }
+}

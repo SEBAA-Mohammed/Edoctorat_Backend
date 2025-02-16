@@ -14,9 +14,12 @@ import java.util.Optional;
 
 @Repository
 
-
 public interface CandidatPostulerRepository extends JpaRepository<CandidatPostulerModel, Long> {
 
     List<CandidatPostulerModel> findBySujetProfesseurId(Long professorId);
+
     Optional<CandidatPostulerModel> findByCandidatAndSujet(CandidatModel candidat, SujetModel sujet);
+
+    Page<CandidatPostulerModel> findByCandidatId(Long candidatId, Pageable pageable);
+
 }

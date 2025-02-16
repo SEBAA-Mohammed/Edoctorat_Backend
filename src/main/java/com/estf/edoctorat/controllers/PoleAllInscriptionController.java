@@ -22,7 +22,7 @@ public class PoleAllInscriptionController {
     @Autowired
     private PoleAllInscriptionService inscriptionService;
 
-    @GetMapping("/get-all-inscriptions")
+    @GetMapping("/get-all-inscriptions/")
     public ResponseEntity<Map<String, Object>> getAllInscriptions(
             @RequestParam(defaultValue = "50") int limit,
             @RequestParam(defaultValue = "0") int offset) {

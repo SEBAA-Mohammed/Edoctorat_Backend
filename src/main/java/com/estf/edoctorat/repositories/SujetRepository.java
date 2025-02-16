@@ -21,4 +21,6 @@ public interface SujetRepository extends JpaRepository<SujetModel, Long> {
     @Query("SELECT s FROM SujetModel s JOIN s.professeur p JOIN p.ced ced WHERE ced.id = :cedId")
     Page<SujetModel> findByCedId(@Param("cedId") Long cedId, Pageable pageable);
 
+    Page<SujetModel> findByPublierTrue(Pageable pageable);
+
 }

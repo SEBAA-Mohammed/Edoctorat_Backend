@@ -21,7 +21,7 @@ public class PostulerController {
     private CandidatPostulerService postulerService;
 
 
-    @GetMapping("get-all-candidats")
+    @GetMapping("/get-all-candidats/")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getAllCandidatPostuler(@RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
 

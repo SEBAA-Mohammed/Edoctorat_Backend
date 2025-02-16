@@ -24,7 +24,7 @@ public class ProfesseurCandidatsController {
     @Autowired
     private ProfesseurCandidatsService professeurCandidatsService;
 
-    @GetMapping("/get-professeur-candidats")
+    @GetMapping("/get-professeur-candidats/")
     public ResponseEntity<Map<String, Object>> getProfesseurCandidats(HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();
