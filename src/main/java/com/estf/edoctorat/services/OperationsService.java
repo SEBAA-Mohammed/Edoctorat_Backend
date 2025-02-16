@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +35,22 @@ public class OperationsService {
     private final SujetService sujetService;
 
     public List<CommissionDto> getAllCommissions() {
-        return commissionRepo.findAll().stream()
+        // Get the authenticated user using Spring Security's SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserModel user = userDetails.getUser();
+
+        // Get the professor from the user
+        ProfesseurModel professeur = user.getProfesseur();
+        if (professeur == null) {
+            throw new RuntimeException("Only professors can access commissions");
+        }
+
+        // Fetch all commissions for the logged-in professor
+        List<CommissionModel> commissions = commissionRepo.findCommissionsByProfesseurId(professeur.getId());
+
+        // Map the commissions to CommissionDto
+        return commissions.stream()
                 .map(commission -> CommissionDtoMapper.toDto(commission, sujetService))
                 .collect(Collectors.toList());
     }
@@ -64,7 +80,22 @@ public class OperationsService {
     }
 
     public List<SujetDto> getAllSujets() {
-        return sujetRepo.findAll().stream()
+        // Get the authenticated user using Spring Security's SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserModel user = userDetails.getUser();
+
+        // Get the professor from the user
+        ProfesseurModel professeur = user.getProfesseur();
+        if (professeur == null) {
+            throw new RuntimeException("Only professors can access subjects");
+        }
+
+        // Fetch all sujets for the logged-in professor
+        List<SujetModel> sujets = sujetRepo.findSujetByProfesseur_Id(professeur.getId());
+
+        // Map the sujets to SujetDto
+        return sujets.stream()
                 .filter(sujet -> sujet != null)
                 .map(sujet -> {
                     try {
@@ -74,7 +105,7 @@ public class OperationsService {
                         return null;
                     }
                 })
-                .filter(dto -> dto != null) 
+                .filter(dto -> dto != null)
                 .collect(Collectors.toList());
     }
 
@@ -85,23 +116,23 @@ public class OperationsService {
     }
 
     public Sujet2Dto createSujet(CreateSujetDto createSujetDto) {
-        // Get the authenticated user using Spring Security's SecurityContextHolder
-        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        // UserModel user = userDetails.getUser();
 
-        // Get the professor from the user
-        // ProfesseurModel professeur = user.getProfesseur();
-        // if (professeur == null) {
-        // throw new RuntimeException("Only professors can create subjects");
-        // }
+         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+         UserModel user = userDetails.getUser();
+
+
+         ProfesseurModel professeur = user.getProfesseur();
+         if (professeur == null) {
+         throw new RuntimeException("Only professors can create subjects");
+         }
 
         SujetModel sujet = new SujetModel();
         sujet.setTitre(createSujetDto.getTitre());
         sujet.setDescription(createSujetDto.getDescription());
 
-        // Set the authenticated professor as the main professor
-        // sujet.setProfesseur(professeur);
+         // Set the authenticated professor as the main professor
+         sujet.setProfesseur(professeur);
 
         // Get and set FormationDoctorale
         FormationdoctoraleModel formationDoctorale = formationDoctoraleRepo

@@ -22,5 +22,6 @@ public interface CommissionRepository extends JpaRepository<CommissionModel, Lon
     @Query("SELECT c FROM CommissionModel c JOIN c.laboratoire l JOIN l.ced ced WHERE ced.id = :cedId")
     Page<CommissionModel> findByCedId(@Param("cedId") Long cedId, Pageable pageable);
 
-
+    @Query("SELECT c FROM CommissionModel c JOIN c.commissionProfesseurs cp WHERE cp.professeur.id = :profId")
+    List<CommissionModel> findCommissionsByProfesseurId(@Param("profId") Long profId);
 }
