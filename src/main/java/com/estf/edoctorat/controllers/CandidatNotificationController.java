@@ -25,8 +25,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Candidate Notifications", description = "APIs for managing candidate notifications and inscriptions")
+@CrossOrigin(origins = "*")
 public class CandidatNotificationController {
 
     @Autowired
@@ -39,9 +49,15 @@ public class CandidatNotificationController {
     @Autowired
     private CandidatPostulerService candidatPostulerService;
 
+    @Operation(summary = "Send notification to candidate", description = "Sends a commission notification to a candidate based on examiner ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Notification sent successfully", content = @Content(schema = @Schema(implementation = CandidatNotificationModel.class))),
+            @ApiResponse(responseCode = "404", description = "Examiner not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/convoque-candidat/{id}/")
-    @ResponseBody
-    public ResponseEntity<?> envoyerNotification(@PathVariable long id) {
+    public ResponseEntity<?> envoyerNotification(
+            @Parameter(description = "ID of the examiner", required = true) @PathVariable long id) {
 
         ExaminerModel examiner = examinerService.getById(id).get();
 
@@ -55,11 +71,17 @@ public class CandidatNotificationController {
         return ResponseEntity.ok(newNotif);
     }
 
+    @Operation(summary = "Get candidate notifications", description = "Retrieves paginated list of notifications for the authenticated candidate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved notifications", content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/get-candidat-notifications/")
     public ResponseEntity<Map<String, Object>> getCandidatNotifications(
-            HttpServletRequest request,
-            @RequestParam(defaultValue = "50") int limit,
-            @RequestParam(defaultValue = "0") int offset) {
+            @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "50") int limit,
+            @Parameter(description = "Page offset") @RequestParam(defaultValue = "0") int offset,
+            HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();
 
@@ -75,9 +97,15 @@ public class CandidatNotificationController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Add inscription to subject", description = "Creates a new inscription for the authenticated candidate to a specific subject")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Inscription added successfully", content = @Content(schema = @Schema(implementation = SujetDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request or subject not found"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated")
+    })
     @PostMapping("/add-inscription/{sujetId}/")
     public ResponseEntity<SujetDto> addInscription(
-            @PathVariable Long sujetId,
+            @Parameter(description = "ID of the subject to inscribe to", required = true) @PathVariable Long sujetId,
             HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();

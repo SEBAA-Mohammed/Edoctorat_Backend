@@ -1,5 +1,6 @@
 package com.estf.edoctorat.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
@@ -34,9 +35,11 @@ public class ProfesseurModel {
     private long labo_id;
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonManagedReference
     private UserModel user;
     @OneToMany(mappedBy = "professeur", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommissionProfesseurModel> commissionProfesseurs;
     @OneToOne(mappedBy = "professeur", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private CedModel ced;
 }

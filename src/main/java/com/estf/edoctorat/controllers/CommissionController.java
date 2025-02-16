@@ -20,8 +20,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Commissions", description = "APIs for managing commissions and their assignments")
+@CrossOrigin(origins = "*")
 public class CommissionController {
 
     @Autowired
@@ -39,12 +49,18 @@ public class CommissionController {
     @Autowired
     private SujetService sujetService;
 
-
+    @Operation(summary = "Create new commission", description = "Creates a new commission with assigned professors")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Commission created successfully", content = @Content(schema = @Schema(implementation = CommissionModel.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/commission/")
     @ResponseBody
-    public ResponseEntity<CommissionModel> addCommission(@RequestBody CommissionCreationDto commissionDto){
+    public ResponseEntity<CommissionModel> addCommission(
+            @Parameter(description = "Commission creation details", required = true) @RequestBody CommissionCreationDto commissionDto) {
 
-        CommissionModel commission = CommissionDtoMapper.toCommission(commissionDto, laboratoireService );
+        CommissionModel commission = CommissionDtoMapper.toCommission(commissionDto, laboratoireService);
 
         CommissionModel savedComm = commissionService.create(commission);
 
@@ -56,9 +72,18 @@ public class CommissionController {
 
     }
 
+    @Operation(summary = "Get laboratory commissions", description = "Retrieves paginated list of commissions for the current user's laboratory")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved commissions", content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/commission/")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getComissions(HttpServletRequest request, @RequestParam(defaultValue = "50") int limit, @RequestParam("0") int offset){
+    public ResponseEntity<Map<String, Object>> getComissions(
+            HttpServletRequest request,
+            @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "50") int limit,
+            @Parameter(description = "Page offset") @RequestParam("0") int offset) {
 
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();
@@ -67,9 +92,8 @@ public class CommissionController {
 
         Page<CommissionModel> commissionsPages = commissionService.getByLabID(idLab, limit, offset);
 
-
         List<CommissionDto> listCommDto = commissionsPages.getContent().stream()
-                .map( commission -> CommissionDtoMapper.toDto(commission, sujetService) )
+                .map(commission -> CommissionDtoMapper.toDto(commission, sujetService))
                 .toList();
 
         Map<String, Object> response = new HashMap<>();
@@ -78,21 +102,27 @@ public class CommissionController {
         response.put("previous", offset > 0 ? Math.max(0, offset - limit) : null);
         response.put("results", listCommDto);
 
-
         return ResponseEntity.ok(response);
 
     }
 
+    @Operation(summary = "Delete commission", description = "Deletes a commission by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Commission deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Commission not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @DeleteMapping("/commission/{id}")
     @ResponseBody
-    public ResponseEntity<?> deleteCommission(@PathVariable long id){
+    public ResponseEntity<?> deleteCommission(
+            @Parameter(description = "ID of the commission to delete") @PathVariable long id) {
 
-        try{
+        try {
 
             commissionService.delete(id);
             return ResponseEntity.ok("Commission supprimer avec succés");
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 
@@ -100,13 +130,22 @@ public class CommissionController {
 
     }
 
+    @Operation(summary = "Get CED commissions", description = "Retrieves paginated list of commissions for the current user's CED")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved CED commissions", content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/get-ced-commissions/")
-    public ResponseEntity<Map<String, Object>> getCommissionCed(HttpServletRequest request,  @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
+    public ResponseEntity<Map<String, Object>> getCommissionCed(
+            HttpServletRequest request,
+            @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "50") int limit,
+            @Parameter(description = "Page offset") @RequestParam(defaultValue = "0") int offset) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel currentUser = ((CustomUserDetails) userDetails).getUser();
-        Page<CommissionModel> listCommissions =  commissionService.getCommissionByCed(currentUser, limit, offset);
+        Page<CommissionModel> listCommissions = commissionService.getCommissionByCed(currentUser, limit, offset);
         List<CommissionDto> listCommDto = listCommissions.stream()
-                .map( commission -> CommissionDtoMapper.toDto(commission, sujetService) )
+                .map(commission -> CommissionDtoMapper.toDto(commission, sujetService))
                 .toList();
         Map<String, Object> response = new HashMap<>();
         response.put("count", listCommDto.size());
@@ -116,12 +155,16 @@ public class CommissionController {
         return ResponseEntity.ok(response);
     }
 
-
-
-
+    @Operation(summary = "Get all commissions", description = "Retrieves paginated list of all commissions")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved all commissions", content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/get-all-commissions/")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getAllCommissions(@RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
+    public ResponseEntity<Map<String, Object>> getAllCommissions(
+            @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "50") int limit,
+            @Parameter(description = "Page offset") @RequestParam(defaultValue = "0") int offset) {
 
         Page<CommissionModel> commissionsPage = commissionService.getAll(limit, offset);
 
@@ -138,6 +181,5 @@ public class CommissionController {
         return ResponseEntity.ok(response);
 
     }
-
 
 }

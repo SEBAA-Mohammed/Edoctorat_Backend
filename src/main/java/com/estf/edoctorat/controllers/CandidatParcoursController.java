@@ -40,20 +40,37 @@ import com.estf.edoctorat.models.DiplomeModel;
 import com.estf.edoctorat.models.UserModel;
 import com.estf.edoctorat.services.DiplomeService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Candidate Academic Path", description = "APIs for managing candidate's diplomas and academic records")
+@CrossOrigin(origins = "*")
 public class CandidatParcoursController {
 
     @Autowired
     private DiplomeService diplomeService;
 
+    @Operation(summary = "Get candidate diplomas", description = "Retrieves a paginated list of diplomas for the authenticated candidate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved diplomas", content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/candidat-parcours/")
     public ResponseEntity<Map<String, Object>> getDiplomes(
-            HttpServletRequest request,
-            @RequestParam(defaultValue = "50") int limit,
-            @RequestParam(defaultValue = "0") int offset) {
+            @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "50") int limit,
+            @Parameter(description = "Page offset") @RequestParam(defaultValue = "0") int offset,
+            HttpServletRequest request) {
 
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
         UserModel user = ((CustomUserDetails) userDetails).getUser();
@@ -82,9 +99,16 @@ public class CandidatParcoursController {
         return baseUrl + "/" + pathPdf;
     }
 
+    @Operation(summary = "Add new diploma", description = "Creates a new diploma entry for the authenticated candidate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Diploma added successfully", content = @Content(schema = @Schema(implementation = DiplomeDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/candidat-parcours/")
     public ResponseEntity<DiplomeDto> addDiplome(
-            @RequestBody Map<String, Object> request,
+            @Parameter(description = "Diploma details", required = true) @RequestBody Map<String, Object> request,
             HttpServletRequest httpRequest) {
 
         try {
@@ -137,77 +161,44 @@ public class CandidatParcoursController {
         }
     }
 
+    @Operation(summary = "Update diploma", description = "Updates an existing diploma entry")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Diploma updated successfully", content = @Content(schema = @Schema(implementation = DiplomeDto.class))),
+            @ApiResponse(responseCode = "404", description = "Diploma not found"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated")
+    })
     @PatchMapping("/candidat-parcours/{id}/")
     public ResponseEntity<DiplomeDto> updateDiplome(
-            @PathVariable Long id,
-            @RequestBody DiplomeModel updates) {
+            @Parameter(description = "ID of the diploma to update") @PathVariable Long id,
+            @Parameter(description = "Updated diploma details", required = true) @RequestBody DiplomeModel updates) {
 
         DiplomeModel updated = diplomeService.update(id, updates);
         return ResponseEntity.ok(DiplomeDtoMapper.toDto(updated));
     }
 
+    @Operation(summary = "Delete diploma", description = "Deletes a diploma entry")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Diploma deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Diploma not found"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated")
+    })
     @DeleteMapping("/candidat-parcours/{id}/")
-    public ResponseEntity<Void> deleteDiplome(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteDiplome(
+            @Parameter(description = "ID of the diploma to delete") @PathVariable Long id) {
         diplomeService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // -----------------------------------------------------------------------
-
-    // @PostMapping("/upload")
-    // public ResponseEntity<Map<String, String>> uploadFile(
-    // @RequestParam("file1") MultipartFile file1,
-    // @RequestParam("file2") MultipartFile file2) throws IOException {
-
-    // Map<String, String> response = new HashMap<>();
-
-    // if (file1.isEmpty() || file2.isEmpty()) {
-    // return ResponseEntity.badRequest()
-    // .body(Collections.singletonMap("error", "Please select both files to
-    // upload"));
-    // }
-
-    // if (!file1.getContentType().equals("application/pdf") ||
-    // !file2.getContentType().equals("application/pdf")) {
-    // return ResponseEntity.badRequest().body(Collections.singletonMap("error",
-    // "Only PDF files are allowed"));
-    // }
-
-    // String uploadDir = "uploads/photos/";
-    // Path uploadPath = Paths.get(uploadDir);
-    // if (!Files.exists(uploadPath)) {
-    // Files.createDirectories(uploadPath);
-    // }
-
-    // try {
-    // String timestamp1 =
-    // LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-    // String filename1 = timestamp1 + "_" + file1.getOriginalFilename();
-    // Path filePath1 = uploadPath.resolve(filename1);
-    // Files.copy(file1.getInputStream(), filePath1,
-    // StandardCopyOption.REPLACE_EXISTING);
-    // response.put("file1", filename1);
-
-    // String timestamp2 =
-    // LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-    // String filename2 = timestamp2 + "_" + file2.getOriginalFilename();
-    // Path filePath2 = uploadPath.resolve(filename2);
-    // Files.copy(file2.getInputStream(), filePath2,
-    // StandardCopyOption.REPLACE_EXISTING);
-    // response.put("file2", filename2);
-
-    // return ResponseEntity.ok(response);
-
-    // } catch (IOException e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    // .body(Collections.singletonMap("error", "File upload failed"));
-    // }
-    // }
-
+    @Operation(summary = "Upload diploma files", description = "Uploads diploma and transcript files for a candidate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Files uploaded successfully", content = @Content(schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid file format"),
+            @ApiResponse(responseCode = "500", description = "Upload failed")
+    })
     @PostMapping(value = "/upload-files/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> uploadFiles(
-            @RequestPart(value = "diplomeFile", required = false) MultipartFile diplomeFile,
-            @RequestPart(value = "releveFile", required = false) MultipartFile releveFile) {
+            @Parameter(description = "Diploma PDF file") @RequestPart(value = "diplomeFile", required = false) MultipartFile diplomeFile,
+            @Parameter(description = "Transcript PDF file") @RequestPart(value = "releveFile", required = false) MultipartFile releveFile) {
 
         Map<String, String> response = new HashMap<>();
         String uploadDir = "uploads/diplomes/";

@@ -25,9 +25,10 @@ public class SujetService {
         return sujetRepository.findById(id);
     }
 
-    public SujetModel create(SujetModel sujetModel , UserModel currentUser) {
+    public SujetModel create(SujetModel sujetModel, UserModel currentUser) {
         sujetModel.setProfesseur(currentUser.getProfesseur());
-        sujetModel.setFormationDoctorale((FormationdoctoraleModel) currentUser.getProfesseur().getEtablissement().getFormationdoctorales());
+        sujetModel.setFormationDoctorale(
+                (FormationdoctoraleModel) currentUser.getProfesseur().getEtablissement().getFormationdoctorales());
         return sujetRepository.save(sujetModel);
     }
 
@@ -40,17 +41,20 @@ public class SujetService {
     }
 
     public void delete(long id) {
-        if(sujetRepository.existsById(id)) {
+        if (sujetRepository.existsById(id)) {
             sujetRepository.deleteById(id);
-        }else{
+        } else {
             throw new RuntimeException("sujet not found");
         }
     }
 
-    public Page<SujetModel> getSujetsByProfID(long id, int limit, int offset) { return sujetRepository.findSujetByProfesseur_Id(id, PageRequest.of(offset/limit, limit)); }
+    public Page<SujetModel> getSujetsByProfID(long id, int limit, int offset) {
+        return sujetRepository.findSujetByProfesseur_Id(id, PageRequest.of(offset / limit, limit));
+    }
 
-
-    public List<SujetModel> getSujetsByProfID(long id) { return sujetRepository.findSujetByProfesseur_Id(id); }
+    public List<SujetModel> getSujetsByProfID(long id) {
+        return sujetRepository.findSujetByProfesseur_Id(id);
+    }
 
     public Page<SujetModel> getSujetByCed(UserModel currentUser, int limit, int offset) {
         long idCed = currentUser.getProfesseur().getCed().getId();
@@ -66,8 +70,13 @@ public class SujetService {
             sujetRepository.save(sujet);
         }
     }
+
     public Page<SujetModel> getPublishedSubjects(int limit, int offset) {
-        return sujetRepository.findByPublierTrue(PageRequest.of(offset / limit, limit));
+        try {
+            return sujetRepository.findByPublierTrue(PageRequest.of(offset / limit, limit));
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching published subjects", e);
+        }
     }
 
 }

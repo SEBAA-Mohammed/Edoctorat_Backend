@@ -1,16 +1,13 @@
 package com.estf.edoctorat.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Schema(description = "Data Transfer Object for professor information")
-public class Professeur2Dto {
-
+@Builder
+@Schema(description = "Extended Data Transfer Object for professor information")
+public class ProfesseurDto3 {
     @Schema(description = "Unique identifier of the professor", example = "1")
     private Long id;
 
@@ -36,5 +33,17 @@ public class Professeur2Dto {
     private int nombreProposer;
 
     @Schema(description = "ID of the institution where professor teaches", example = "1")
-    private Long etablissement;
+    private Long etablissement_id;
+
+    @Schema(description = "Name of the institution", example = "Faculty of Sciences")
+    private String etablissementNom;
+
+    @Schema(description = "ID of the laboratory where professor works", example = "1")
+    private long labo_id;
+
+    @Schema(description = "Professor's last name", example = "Smith")
+    private String nom;
+
+    @Schema(description = "Professor's first name", example = "John")
+    private String prenom;
 }

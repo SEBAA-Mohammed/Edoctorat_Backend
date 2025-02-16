@@ -31,8 +31,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 @RequestMapping("/api/")
+@Tag(name = "Candidat", description = "Candidate management APIs")
+@CrossOrigin(origins = "*")
 public class CandidatController {
 
     @Value("${app.base-url}")
@@ -53,21 +61,44 @@ public class CandidatController {
         return baseUrl + "/" + pathPhoto;
     }
 
+    @Operation(summary = "Get all candidates", description = "Retrieves a list of all candidates")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved candidates"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping()
     public List<CandidatModel> index() {
         return candidatService.getCandidats();
     }
 
+    @Operation(summary = "Get candidate by ID", description = "Retrieves a candidate by their ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved candidate"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
     @GetMapping("/{id}/")
-    public Optional<CandidatModel> getById(@PathVariable Long id) {
+    public Optional<CandidatModel> getById(
+            @Parameter(description = "ID of the candidate to retrieve") @PathVariable Long id) {
         return candidatService.getCandidatById(id);
     }
 
+    @Operation(summary = "Search candidates by name", description = "Retrieves candidates matching the given name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved candidates"),
+            @ApiResponse(responseCode = "404", description = "No candidates found")
+    })
     @GetMapping("/search/{name}/")
-    public List<CandidatModel> getByName(@PathVariable String name) {
+    public List<CandidatModel> getByName(
+            @Parameter(description = "Name to search for") @PathVariable String name) {
         return candidatService.getCandidatByName(name);
     }
 
+    @Operation(summary = "Get candidate info", description = "Retrieves information for the currently authenticated candidate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved candidate info"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
     @GetMapping("/candidat-info/")
     public ResponseEntity<CandidatDto> getCandidatInfo(@AuthenticationPrincipal UserDetails userDetails) {
         UserModel user = userRepository.findByEmail(userDetails.getUsername())
@@ -81,14 +112,26 @@ public class CandidatController {
         return ResponseEntity.ok(candidat);
     }
 
+    @Operation(summary = "Get candidate profile", description = "Retrieves detailed profile for a specific candidate")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved candidate profile"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
     @GetMapping("/get-candidat-profile/{id}/")
-    public ResponseEntity<CandidatModel> getCandidatProfile(@PathVariable Long id) {
-        CandidatModel candidat = candidatService.getCandidatProfile(id);
-        return ResponseEntity.ok(candidat);
+    public ResponseEntity<CandidatModel> getCandidatProfile(
+            @Parameter(description = "ID of the candidate") @PathVariable Long id) {
+        return ResponseEntity.ok(candidatService.getCandidatProfile(id));
     }
 
+    @Operation(summary = "Create new candidate", description = "Creates a new candidate profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Candidate created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @PostMapping
-    public ResponseEntity<CandidatModel> create(@RequestBody CandidatModel candidat) {
+    public ResponseEntity<CandidatModel> create(
+            @Parameter(description = "Candidate details", required = true) @RequestBody CandidatModel candidat) {
         if (candidat.getUser() == null || candidat.getUser().getId() == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -104,35 +147,55 @@ public class CandidatController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCandidat);
     }
 
+    @Operation(summary = "Update candidate", description = "Updates an existing candidate's information")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Candidate updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
     @PutMapping("/{id}/")
-    public CandidatModel update(@PathVariable Long id, @RequestBody CandidatModel candidat) {
+    public CandidatModel update(
+            @Parameter(description = "ID of the candidate to update") @PathVariable Long id,
+            @Parameter(description = "Updated candidate details", required = true) @RequestBody CandidatModel candidat) {
         return candidatService.updateCandidat(id, candidat);
     }
 
+    @Operation(summary = "Delete candidate", description = "Deletes a candidate profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Candidate deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
     @DeleteMapping("/{id}/")
-    public String deleteCandidat(@PathVariable Long id) {
+    public String deleteCandidat(
+            @Parameter(description = "ID of the candidate to delete") @PathVariable Long id) {
         candidatService.deleteCandidat(id);
         return "Candidat with ID " + id + " has been deleted!";
     }
 
+    @Operation(summary = "Update candidate info with files", description = "Updates candidate information including photo upload")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Candidate info updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "404", description = "Candidate not found")
+    })
     @PutMapping(value = "/candidat-info/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateCandidatInfo(
-            @RequestPart(value = "prenom") String prenom,
-            @RequestPart(value = "nom") String nom,
-            @RequestPart(value = "nomCandidatAr") String nomCandidatAr,
-            @RequestPart(value = "prenomCandidatAr") String prenomCandidatAr,
-            @RequestPart(value = "cne") String cne,
-            @RequestPart(value = "adresse") String adresse,
-            @RequestPart(value = "pays") String pays,
-            @RequestPart(value = "sexe") String sexe,
-            @RequestPart(value = "villeDeNaissance") String villeDeNaissance,
-            @RequestPart(value = "villeDeNaissanceAr") String villeDeNaissanceAr,
-            @RequestPart(value = "ville") String ville,
-            @RequestPart(value = "dateDeNaissance") String dateDeNaissance,
-            @RequestPart(value = "mailCandidat") String mailCandidat,
-            @RequestPart(value = "telCandidat") String telCandidat,
-            @RequestPart(value = "pathPhoto", required = false) MultipartFile pathPhoto,
-            @RequestPart(value = "situation_familiale") String situation_familiale,
+            @Parameter(description = "First name") @RequestPart(value = "prenom") String prenom,
+            @Parameter(description = "Last name") @RequestPart(value = "nom") String nom,
+            @Parameter(description = "Arabic first name") @RequestPart(value = "nomCandidatAr") String nomCandidatAr,
+            @Parameter(description = "Arabic last name") @RequestPart(value = "prenomCandidatAr") String prenomCandidatAr,
+            @Parameter(description = "CNE number") @RequestPart(value = "cne") String cne,
+            @Parameter(description = "Address") @RequestPart(value = "adresse") String adresse,
+            @Parameter(description = "Country") @RequestPart(value = "pays") String pays,
+            @Parameter(description = "Gender") @RequestPart(value = "sexe") String sexe,
+            @Parameter(description = "Birth city") @RequestPart(value = "villeDeNaissance") String villeDeNaissance,
+            @Parameter(description = "Birth city in Arabic") @RequestPart(value = "villeDeNaissanceAr") String villeDeNaissanceAr,
+            @Parameter(description = "Current city") @RequestPart(value = "ville") String ville,
+            @Parameter(description = "Birth date") @RequestPart(value = "dateDeNaissance") String dateDeNaissance,
+            @Parameter(description = "Email") @RequestPart(value = "mailCandidat") String mailCandidat,
+            @Parameter(description = "Phone number") @RequestPart(value = "telCandidat") String telCandidat,
+            @Parameter(description = "Profile photo") @RequestPart(value = "pathPhoto", required = false) MultipartFile pathPhoto,
+            @Parameter(description = "Marital status") @RequestPart(value = "situation_familiale") String situation_familiale,
             HttpServletRequest request) {
 
         try {

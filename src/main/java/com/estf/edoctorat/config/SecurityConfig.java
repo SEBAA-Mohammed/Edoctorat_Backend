@@ -42,7 +42,12 @@ public class SecurityConfig {
                                                                 "/api/register/candidat/",
                                                                 "/api/confirm-email/",
                                                                 "/api/verify-token/",
-                                                                "/uploads/**")
+                                                                "/api/verify-email/",
+                                                                "/api/sujets/**",
+                                                                "/api/verify-token/",
+                                                                "/uploads/**", "/v3/api-docs/**",
+                                                                "/swagger-ui/**",
+                                                                "/swagger-ui.html")
                                                 .permitAll()
                                                 .anyRequest().authenticated())
                                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

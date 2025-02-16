@@ -47,8 +47,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Cookie;
 import com.estf.edoctorat.repositories.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Authentication", description = "Authentication management APIs")
 public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -85,6 +94,11 @@ public class AuthController {
         return googleTokenVerifier.verify(idTokenString);
     }
 
+    @Operation(summary = "Authenticate user", description = "Authenticates a user and returns JWT tokens")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully authenticated", content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+    })
     @PostMapping("/token/")
     public ResponseEntity<?> authenticate(
             @RequestBody LoginRequest request,
@@ -117,6 +131,10 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Logout user", description = "Invalidates the user's JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully logged out"),
+    })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
         Cookie jwtCookie = new Cookie("jwt", null);
@@ -206,6 +224,11 @@ public class AuthController {
         return baseUrl + "/" + pathPhoto;
     }
 
+    @Operation(summary = "Verify professor", description = "Verifies if the user is a professor using Google token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully verified professor"),
+            @ApiResponse(responseCode = "401", description = "Not authorized or not a professor")
+    })
     @PostMapping("/verify-is-prof/")
     public ResponseEntity<?> verifyProfessor(@RequestBody Map<String, String> request) {
         try {
@@ -226,6 +249,11 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Register candidate", description = "Registers a new candidate user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully registered candidate", content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Registration failed")
+    })
     @PostMapping("/register/candidat/")
     public ResponseEntity<?> registerCandidat(@RequestBody RegisterRequest request) {
         try {
@@ -296,6 +324,12 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Access protected route", description = "Test endpoint for protected routes")
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully accessed protected route"),
+            @ApiResponse(responseCode = "401", description = "Not authorized")
+    })
     @GetMapping("/protected")
     public ResponseEntity<?> protectedRoute(HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
@@ -304,6 +338,12 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
+    @Operation(summary = "Get user info", description = "Retrieves information about the authenticated user")
+    @SecurityRequirement(name = "JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user info"),
+            @ApiResponse(responseCode = "401", description = "Not authorized")
+    })
     @GetMapping("/get-user-info/")
     public ResponseEntity<?> getUserInfo(HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) request.getAttribute("user");
@@ -311,6 +351,11 @@ public class AuthController {
         return ResponseEntity.ok(createUserInfo(user));
     }
 
+    @Operation(summary = "Confirm email", description = "Sends confirmation email to user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Confirmation email sent successfully"),
+            @ApiResponse(responseCode = "400", description = "Failed to process request")
+    })
     @PostMapping("/confirm-email/")
     public ResponseEntity<?> confirmEmail(@RequestBody PreRegisterRequest request) {
         try {
@@ -400,6 +445,11 @@ public class AuthController {
         emailService.sendHtmlEmail(email, "Confirm your email", emailContent);
     }
 
+    @Operation(summary = "Verify token", description = "Verifies email confirmation token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token verified successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired token")
+    })
     @PostMapping("/verify-token/")
     public ResponseEntity<?> verifyToken(@RequestBody Map<String, String> body) {
         Map<String, Object> response = new HashMap<>();

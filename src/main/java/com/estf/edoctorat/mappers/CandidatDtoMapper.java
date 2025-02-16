@@ -89,7 +89,6 @@ public class CandidatDtoMapper {
 
         // Note: You'll need to set up the User and Pays relationships separately
         // as they require fetching from their respective repositories
-
         return candidat;
     }
 

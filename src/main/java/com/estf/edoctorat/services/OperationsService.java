@@ -1,13 +1,18 @@
 package com.estf.edoctorat.services;
 
+import com.estf.edoctorat.config.CustomUserDetails;
 import com.estf.edoctorat.dto.*;
 import com.estf.edoctorat.mappers.CommissionDtoMapper;
 import com.estf.edoctorat.mappers.InscriptionMapper;
 import com.estf.edoctorat.models.*;
 import com.estf.edoctorat.repositories.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,14 +33,11 @@ public class OperationsService {
     private final InscriptionMapper inscriptionMapper;
     private final SujetService sujetService;
 
-
     public List<CommissionDto> getAllCommissions() {
         return commissionRepo.findAll().stream()
                 .map(commission -> CommissionDtoMapper.toDto(commission, sujetService))
                 .collect(Collectors.toList());
     }
-
-
 
     public Page<InscriptionDto> getMesInscrits(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -48,6 +50,7 @@ public class OperationsService {
         return examinerRepo.findAll(pageRequest)
                 .map(this::mapToExaminerDto);
     }
+
     public List<FormationdoctoraleDto> getAllFormationDoctorales() {
         return formationDoctoraleRepo.findAll().stream()
                 .map(this::mapToFormationDoctoraleDto)
@@ -60,9 +63,18 @@ public class OperationsService {
                 .collect(Collectors.toList());
     }
 
-    public List<Sujet2Dto> getAllSujets() {
+    public List<SujetDto> getAllSujets() {
         return sujetRepo.findAll().stream()
-                .map(this::mapToSujetDto)
+                .filter(sujet -> sujet != null)
+                .map(sujet -> {
+                    try {
+                        return mapToSujetDtoNew(sujet);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .filter(dto -> dto != null) 
                 .collect(Collectors.toList());
     }
 
@@ -72,8 +84,40 @@ public class OperationsService {
                 .orElseThrow(() -> new RuntimeException("Sujet not found"));
     }
 
-    public Sujet2Dto createSujet(Sujet2Dto sujetDto) {
-        SujetModel sujet = mapToSujetModel(sujetDto);
+    public Sujet2Dto createSujet(CreateSujetDto createSujetDto) {
+        // Get the authenticated user using Spring Security's SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserModel user = userDetails.getUser();
+
+        // Get the professor from the user
+        // ProfesseurModel professeur = user.getProfesseur();
+        // if (professeur == null) {
+        // throw new RuntimeException("Only professors can create subjects");
+        // }
+
+        SujetModel sujet = new SujetModel();
+        sujet.setTitre(createSujetDto.getTitre());
+        sujet.setDescription(createSujetDto.getDescription());
+
+        // Set the authenticated professor as the main professor
+        // sujet.setProfesseur(professeur);
+
+        // Get and set FormationDoctorale
+        FormationdoctoraleModel formationDoctorale = formationDoctoraleRepo
+                .findById(createSujetDto.getFormationDoctoraleId())
+                .orElseThrow(() -> new RuntimeException("Formation doctorale not found"));
+        sujet.setFormationDoctorale(formationDoctorale);
+
+        if (createSujetDto.getCoDirecteurId() != null) {
+            ProfesseurModel coDirecteur = professeurRepo
+                    .findById(createSujetDto.getCoDirecteurId())
+                    .orElseThrow(() -> new RuntimeException("Co-directeur not found"));
+            sujet.setCodirecteur(coDirecteur);
+        }
+
+        sujet.setPublier(true);
+
         SujetModel savedSujet = sujetRepo.save(sujet);
         return mapToSujetDto(savedSujet);
     }
@@ -95,7 +139,21 @@ public class OperationsService {
         sujetRepo.deleteById(id);
     }
 
-    // Mapping methods
+    private SujetDto mapToSujetDtoNew(SujetModel model) {
+        if (model == null)
+            return null;
+
+        return new SujetDto(
+                model.getId(),
+                model.getProfesseur() != null ? mapToProfesseurDto(model.getProfesseur()) : null,
+                model.getFormationDoctorale() != null ? mapToFormationDoctoraleDto(model.getFormationDoctorale())
+                        : null,
+                model.getTitre(),
+                model.getCodirecteur() != null ? mapToProfesseurDto(model.getCodirecteur()) : null,
+                model.getDescription(),
+                model.getPublier());
+    }
+
     private FormationdoctoraleDto mapToFormationDoctoraleDto(FormationdoctoraleModel model) {
         return new FormationdoctoraleDto(
                 model.getId(),
@@ -105,16 +163,14 @@ public class OperationsService {
                 model.getPathImage(),
                 model.getTitre(),
                 model.getInitiale(),
-                model.getDateAccreditation()
-        );
+                model.getDateAccreditation());
     }
 
     private ProfesseurDto mapToProfesseurDto(ProfesseurModel model) {
         return new ProfesseurDto(
                 model.getId(),
                 model.getUser().getFirst_name(),
-                model.getUser().getLast_name()
-        );
+                model.getUser().getLast_name());
     }
 
     private Sujet2Dto mapToSujetDto(SujetModel model) {
@@ -125,8 +181,7 @@ public class OperationsService {
                 model.getTitre(),
                 model.getDescription(),
                 model.getFormationDoctorale(),
-                model.getPublier()
-        );
+                model.getPublier());
     }
 
     private SujetModel mapToSujetModel(Sujet2Dto dto) {
@@ -148,8 +203,7 @@ public class OperationsService {
                 model.getDateDisposeDossier().toString(),
                 model.getRemarque(),
                 (model.getValider() != 0),
-                getCandidatPostulerPathFile(model.getCandidat(), model.getSujet())
-        );
+                getCandidatPostulerPathFile(model.getCandidat(), model.getSujet()));
     }
 
     private String getCandidatPostulerPathFile(CandidatModel candidat, SujetModel sujet) {
@@ -183,8 +237,7 @@ public class OperationsService {
                 model.getPathPhoto(),
                 model.getEtatDossier(),
                 model.getSituation_familiale(),
-                model.isFonctionnaire()
-        );
+                model.isFonctionnaire());
     }
 
     private ExaminerDto mapToExaminerDto(ExaminerModel model) {

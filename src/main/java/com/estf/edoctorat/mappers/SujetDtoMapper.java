@@ -5,19 +5,14 @@ import com.estf.edoctorat.dto.SujetDto;
 import com.estf.edoctorat.models.SujetModel;
 
 public class SujetDtoMapper {
-
-    public static SujetDto toDto(SujetModel sujet){
-
+    public static SujetDto toDto(SujetModel sujet) {
         return new SujetDto(
                 sujet.getId(),
-                ProfesseurDtoMapper.toDto(sujet.getProfesseur()),
-                FormationdoctoraleDtoMapper.toDto(sujet.getFormationDoctorale()),
+                sujet.getProfesseur() != null ? ProfesseurDtoMapper.toDto(sujet.getProfesseur()) : null,
+                sujet.getFormationDoctorale() != null ? FormationdoctoraleDtoMapper.toDto(sujet.getFormationDoctorale()) : null,
                 sujet.getTitre(),
                 sujet.getCodirecteur() != null ? ProfesseurDtoMapper.toDto(sujet.getCodirecteur()) : null,
                 sujet.getDescription(),
-                sujet.getPublier()
-        );
-
+                sujet.getPublier());
     }
-
 }
