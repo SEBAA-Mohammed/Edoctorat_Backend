@@ -38,7 +38,7 @@ public class OperationsController {
 
         return ResponseEntity.ok(response);
     }
-    @GetMapping("/sujets/{id}")
+    @GetMapping("/sujets/{id}/")
     public ResponseEntity<Sujet2Dto> getSujet(@PathVariable Long id) {
         return ResponseEntity.ok(operationsService.getSujetById(id));
     }
