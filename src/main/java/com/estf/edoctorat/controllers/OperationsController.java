@@ -79,26 +79,13 @@ public class OperationsController {
         return ResponseEntity.ok(operationsService.createSujet(sujet));
     }
 
-    @Operation(summary = "Update subject", description = "Updates an existing subject")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Subject updated successfully", content = @Content(schema = @Schema(implementation = Sujet2Dto.class))),
-            @ApiResponse(responseCode = "404", description = "Subject not found")
-    })
     @PutMapping("/sujets/{id}/")
-    public ResponseEntity<Sujet2Dto> updateSujet(
-            @Parameter(description = "Subject ID") @PathVariable Long id,
-            @Parameter(description = "Updated subject details", required = true) @RequestBody Sujet2Dto sujet) {
+    public ResponseEntity<Sujet2Dto> updateSujet(@PathVariable Long id, @RequestBody UpdateSujetDto sujet) {
         return ResponseEntity.ok(operationsService.updateSujet(id, sujet));
     }
 
-    @Operation(summary = "Delete subject", description = "Deletes a subject by its ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Subject deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Subject not found")
-    })
     @DeleteMapping("/sujets/{id}/")
-    public ResponseEntity<Void> deleteSujet(
-            @Parameter(description = "Subject ID") @PathVariable Long id) {
+    public ResponseEntity<Void> deleteSujet(@PathVariable Long id) {
         operationsService.deleteSujet(id);
         return ResponseEntity.ok().build();
     }
