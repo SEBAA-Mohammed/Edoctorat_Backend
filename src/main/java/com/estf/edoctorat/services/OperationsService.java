@@ -84,17 +84,17 @@ public class OperationsService {
         UserModel user = userDetails.getUser();
 
         // Get the professor from the user
-//        ProfesseurModel professeur = user.getProfesseur();
-//        if (professeur == null) {
-//            throw new RuntimeException("Only professors can create subjects");
-//        }
+        ProfesseurModel professeur = user.getProfesseur();
+        if (professeur == null) {
+            throw new RuntimeException("Only professors can create subjects");
+        }
 
         SujetModel sujet = new SujetModel();
         sujet.setTitre(createSujetDto.getTitre());
         sujet.setDescription(createSujetDto.getDescription());
 
         // Set the authenticated professor as the main professor
-//        sujet.setProfesseur(professeur);
+        sujet.setProfesseur(professeur);
 
         // Get and set FormationDoctorale
         FormationdoctoraleModel formationDoctorale = formationDoctoraleRepo
@@ -117,14 +117,42 @@ public class OperationsService {
         return mapToSujetDto(savedSujet);
     }
 
-    public Sujet2Dto updateSujet(Long id, Sujet2Dto sujetDto) {
-        if (!sujetRepo.existsById(id)) {
-            throw new RuntimeException("Sujet not found");
+    public Sujet2Dto updateSujet(Long id, UpdateSujetDto sujetDto) {
+        // First fetch the existing sujet
+        SujetModel existingSujet = sujetRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sujet not found"));
+
+        // Get the authenticated professor
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        ProfesseurModel authenticatedProfessor = professeurRepo.findByEmail(authentication.getName())
+//                .orElseThrow(() -> new RuntimeException("Authenticated professor not found"));
+//
+//        // Verify that the authenticated professor is the owner of the sujet
+//        if (!existingSujet.getProfesseur().getId().equals(authenticatedProfessor.getId())) {
+//            throw new AccessDeniedException("You don't have permission to update this sujet");
+//        }
+
+        // Update the fields
+        existingSujet.setTitre(sujetDto.getTitre());
+        existingSujet.setDescription(sujetDto.getDescription());
+
+        // Update FormationDoctorale if needed
+        if (sujetDto.getFormationDoctoraleId() != null) {
+            FormationdoctoraleModel formationDoctorale = formationDoctoraleRepo
+                    .findById(Long.parseLong(sujetDto.getFormationDoctoraleId()))
+                    .orElseThrow(() -> new RuntimeException("Formation doctorale not found"));
+            existingSujet.setFormationDoctorale(formationDoctorale);
         }
-        SujetModel sujet = mapToSujetModel(sujetDto);
-        sujet.setId(id);
-        SujetModel updatedSujet = sujetRepo.save(sujet);
-        return mapToSujetDto(updatedSujet);
+
+        // Update CoDirecteur if provided
+        if (sujetDto.getCoDirecteurId() != null) {
+            ProfesseurModel coDirecteur = professeurRepo
+                    .findById(Long.parseLong(sujetDto.getCoDirecteurId()))
+                    .orElseThrow(() -> new RuntimeException("Co-directeur not found"));
+            existingSujet.setCodirecteur(coDirecteur);
+        }
+
+        return mapToSujetDto(sujetRepo.save(existingSujet));
     }
 
     public void deleteSujet(Long id) {

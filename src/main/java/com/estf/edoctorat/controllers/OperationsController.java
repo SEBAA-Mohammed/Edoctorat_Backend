@@ -49,12 +49,12 @@ public class OperationsController {
         return ResponseEntity.ok(operationsService.createSujet(sujet));
     }
 
-    @PutMapping("/sujets/{id}")
-    public ResponseEntity<Sujet2Dto> updateSujet(@PathVariable Long id, @RequestBody Sujet2Dto sujet) {
+    @PutMapping("/sujets/{id}/")
+    public ResponseEntity<Sujet2Dto> updateSujet(@PathVariable Long id, @RequestBody UpdateSujetDto sujet) {
         return ResponseEntity.ok(operationsService.updateSujet(id, sujet));
     }
 
-    @DeleteMapping("/sujets/{id}")
+    @DeleteMapping("/sujets/{id}/")
     public ResponseEntity<Void> deleteSujet(@PathVariable Long id) {
         operationsService.deleteSujet(id);
         return ResponseEntity.ok().build();
@@ -96,8 +96,4 @@ public class OperationsController {
 
         return ResponseEntity.ok(response);
     }
-    //    @GetMapping("/get-professeurs")
-//    public ResponseEntity<List<ProfesseurDto>> getProfesseurs() {
-//        return ResponseEntity.ok(operationsService.getAllProfesseurs());
-//    }
 }
